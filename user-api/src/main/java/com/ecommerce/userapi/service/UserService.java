@@ -16,6 +16,7 @@ public class UserService {
 
     @Autowired
     private UserRepository userRepository;
+
     @Autowired
     private MapperImpl mapper;
 
@@ -32,6 +33,7 @@ public class UserService {
     }
 
     public UserDto save(UserDto userDto) {
+        userDto.setNome(userDto.getNome().toLowerCase());
         UserEntity user = userRepository.save(mapper.mapFrom(userDto));
         return mapper.mapTo(user);
     }
