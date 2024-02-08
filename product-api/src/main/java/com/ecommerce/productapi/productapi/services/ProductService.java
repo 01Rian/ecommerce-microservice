@@ -4,6 +4,7 @@ import com.ecommerce.productapi.productapi.domain.dto.ProductDto;
 import com.ecommerce.productapi.productapi.domain.entities.ProductEntity;
 import com.ecommerce.productapi.productapi.mappers.impl.ProductMapper;
 import com.ecommerce.productapi.productapi.repositories.ProductRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -44,12 +45,19 @@ public class ProductService {
         return null;
     }
 
+    @Transactional
     public ProductDto save(ProductDto productDto) {
         productDto.setProductIdentifier(productDto.getProductIdentifier().toLowerCase());
         productDto.setNome(productDto.getNome().toLowerCase());
 
-        ProductEntity product = productRepository.save(mapper.mapFrom(productDto));
-        return mapper.mapTo(product);
+        ProductEntity existingProduct = productRepository.findByProductIdentifier(productDto.getProductIdentifier());
+
+        if (existingProduct != null) {
+            return null;
+        } else {
+            ProductEntity product = productRepository.save(mapper.mapFrom(productDto));
+            return mapper.mapTo(product);
+        }
     }
 
     public void delete(long productId) {
