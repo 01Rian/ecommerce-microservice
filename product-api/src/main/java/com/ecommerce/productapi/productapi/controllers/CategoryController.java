@@ -16,13 +16,24 @@ public class CategoryController {
     private CategoryService categoryService;
 
     @GetMapping("/categories")
-    public List<CategoryDto> getCategories() {
+    public List<CategoryDto> getAllCategories() {
         return categoryService.getAll();
+    }
+
+    @GetMapping("/categories/{id}")
+    public CategoryDto getCategoryById(@PathVariable("id") long id) {
+        return categoryService.getCategoryById(id);
     }
 
     @PostMapping("/categories")
     @ResponseStatus(HttpStatus.CREATED)
     public CategoryDto newCategory(@Valid @RequestBody CategoryDto categoryDto) {
         return categoryService.save(categoryDto);
+    }
+
+    @DeleteMapping("/categories/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteCategory(@PathVariable("id") long id) {
+        categoryService.deleteById(id);
     }
 }
