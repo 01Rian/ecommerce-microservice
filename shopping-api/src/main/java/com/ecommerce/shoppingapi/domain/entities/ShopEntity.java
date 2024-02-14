@@ -7,15 +7,14 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Table(name = "shop")
 @Entity
+@Table(name = "shop")
 public class ShopEntity {
 
     @Id

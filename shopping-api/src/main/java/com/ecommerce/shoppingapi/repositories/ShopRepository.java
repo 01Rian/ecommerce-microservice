@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
-public interface ShopRepository extends JpaRepository<ShopEntity, Long> {
+public interface ShopRepository extends JpaRepository<ShopEntity, Long>, ReportRepository {
 
      List<ShopEntity> findAllByUserIdentifier(String userIdentifier);
 
