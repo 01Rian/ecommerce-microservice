@@ -2,12 +2,15 @@ package com.ecommerce.shoppingapi.services;
 
 import com.ecommerce.shoppingapi.domain.dto.ItemDto;
 import com.ecommerce.shoppingapi.domain.dto.ShopDto;
+import com.ecommerce.shoppingapi.domain.dto.ShopReportDto;
 import com.ecommerce.shoppingapi.domain.entities.ShopEntity;
 import com.ecommerce.shoppingapi.mappers.impl.ShopMapper;
 import com.ecommerce.shoppingapi.repositories.ShopRepository;
+import com.ecommerce.shoppingapi.repositories.impl.ReportRepositoryImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -18,6 +21,9 @@ public class ShopService {
 
     @Autowired
     private ShopRepository shopRepository;
+
+    @Autowired
+    private ReportRepositoryImpl reportRepository;
 
     @Autowired
     private ShopMapper mapper;
@@ -63,5 +69,17 @@ public class ShopService {
         shopEntity.setDate(LocalDateTime.now());
         shopEntity = shopRepository.save(shopEntity);
         return mapper.mapTo(shopEntity);
+    }
+
+    public List<ShopDto> getShopsByFilter(LocalDate startDate, LocalDate endDate, Float maxValue) {
+        List<ShopEntity> shops = reportRepository.getShopByFilters(startDate, endDate, maxValue);
+        return shops
+                .stream()
+                .map(mapper::mapTo)
+                .collect(Collectors.toList());
+    }
+
+    public ShopReportDto getReportByDate(LocalDate startDate, LocalDate endDate) {
+        return reportRepository.getReportByDate(startDate, endDate);
     }
  }
