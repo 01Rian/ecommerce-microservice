@@ -7,7 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor
@@ -26,5 +26,5 @@ public class UserDto {
     @NotBlank
     private String telefone;
     @NotNull
-    private LocalDate dataCadastro;
+    private LocalDateTime dataCadastro;
 }
