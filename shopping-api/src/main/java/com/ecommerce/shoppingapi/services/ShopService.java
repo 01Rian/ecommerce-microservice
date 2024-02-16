@@ -1,6 +1,7 @@
 package com.ecommerce.shoppingapi.services;
 
 import com.ecommerce.shoppingapi.domain.dto.ItemDto;
+import com.ecommerce.shoppingapi.domain.dto.ProductDto;
 import com.ecommerce.shoppingapi.domain.dto.ShopDto;
 import com.ecommerce.shoppingapi.domain.dto.ShopReportDto;
 import com.ecommerce.shoppingapi.domain.entities.ShopEntity;
@@ -19,14 +20,20 @@ import java.util.stream.Collectors;
 @Service
 public class ShopService {
 
-    @Autowired
     private ShopRepository shopRepository;
-
-    @Autowired
     private ReportRepositoryImpl reportRepository;
+    private ShopMapper mapper;
+    private ProductService productService;
+    private UserService userService;
 
     @Autowired
-    private ShopMapper mapper;
+    public ShopService(ShopRepository shopRepository, ReportRepositoryImpl reportRepository, ShopMapper mapper, ProductService productService, UserService userService) {
+        this.shopRepository = shopRepository;
+        this.reportRepository = reportRepository;
+        this.mapper = mapper;
+        this.productService = productService;
+        this.userService = userService;
+    }
 
     public List<ShopDto> getAll() {
         List<ShopEntity> shops = shopRepository.findAll();
@@ -58,6 +65,14 @@ public class ShopService {
     }
 
     public ShopDto save(ShopDto shopDto) {
+
+        if (userService.getUserByCfp(shopDto.getUserIdentifier()) == null) {
+            return null;
+        }
+
+        if (!validateProducts(shopDto.getItems())) {
+            return null;
+        }
         shopDto.setTotal(
                 shopDto.getItems()
                         .stream()
@@ -67,8 +82,21 @@ public class ShopService {
 
         ShopEntity shopEntity = mapper.mapFrom(shopDto);
         shopEntity.setDate(LocalDateTime.now());
+
         shopEntity = shopRepository.save(shopEntity);
         return mapper.mapTo(shopEntity);
+    }
+
+    private boolean validateProducts(List<ItemDto> items) {
+        for (ItemDto item : items) {
+            ProductDto productDto = productService.getProductByIdentifier(item.getProductIdentifier());
+
+            if (productDto == null) {
+                return false;
+            }
+            item.setPrice(productDto.getPreco());
+        }
+        return true;
     }
 
     public List<ShopDto> getShopsByFilter(LocalDate startDate, LocalDate endDate, Float maxValue) {
