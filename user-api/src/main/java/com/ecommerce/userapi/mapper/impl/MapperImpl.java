@@ -1,7 +1,8 @@
-package com.ecommerce.userapi.mapper;
+package com.ecommerce.userapi.mapper.impl;
 
 import com.ecommerce.userapi.domain.dto.UserDto;
 import com.ecommerce.userapi.domain.entity.UserEntity;
+import com.ecommerce.userapi.mapper.Mapper;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 
