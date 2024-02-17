@@ -2,6 +2,7 @@ package com.ecommerce.userapi.controller;
 
 import com.ecommerce.userapi.domain.dto.UserDto;
 import com.ecommerce.userapi.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -26,7 +27,7 @@ public class UserController {
 
     @PostMapping("/users")
     @ResponseStatus(HttpStatus.CREATED)
-    public UserDto newUser(@RequestBody UserDto userDto) {
+    public UserDto newUser(@Valid @RequestBody UserDto userDto) {
         return userService.save(userDto);
     }
 
