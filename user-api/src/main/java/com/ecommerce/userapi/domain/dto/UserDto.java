@@ -1,5 +1,7 @@
 package com.ecommerce.userapi.domain.dto;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,11 +15,16 @@ import java.time.LocalDateTime;
 @Builder
 public class UserDto {
 
-    private long id;
+    @NotBlank
     private String nome;
+    @NotBlank
     private String cpf;
+    @NotBlank
     private String endereco;
+    @NotBlank
     private String email;
+    @NotBlank
     private String telefone;
+    @NotNull
     private LocalDateTime dataCadastro;
 }
