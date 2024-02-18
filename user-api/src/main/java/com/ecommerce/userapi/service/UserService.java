@@ -7,6 +7,8 @@ import com.ecommerce.userapi.exception.UserNotFoundException;
 import com.ecommerce.userapi.mapper.impl.MapperImpl;
 import com.ecommerce.userapi.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,6 +34,12 @@ public class UserService {
         return users.stream()
                 .map(mapper::mapTo)
                 .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public Page<UserDto> getAllPage(PageRequest page) {
+        Page<UserEntity> users = userRepository.findAll(page);
+        return users.map(mapper::mapTo);
     }
 
     @Transactional(readOnly = true)
