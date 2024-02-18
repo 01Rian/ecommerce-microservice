@@ -40,21 +40,9 @@ public class UserController {
         return userService.findById(id);
     }
 
-    @PostMapping("/users")
-    @ResponseStatus(HttpStatus.CREATED)
-    public UserDto newUser(@Valid @RequestBody UserDto userDto) {
-        return userService.save(userDto);
-    }
-
     @GetMapping("/users/cpf/{cpf}")
     public UserDto findByCpf(@PathVariable("cpf") String cpf) {
         return userService.findByCpf(cpf);
-    }
-
-    @DeleteMapping("/users/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable("id") Long id) {
-         userService.delete(id);
     }
 
     @GetMapping("/users/search")
@@ -62,5 +50,22 @@ public class UserController {
             @RequestParam(name = "name", required = true)
             String name) {
         return userService.queryByName(name);
+    }
+
+    @PostMapping("/users")
+    @ResponseStatus(HttpStatus.CREATED)
+    public UserDto newUser(@Valid @RequestBody UserDto userDto) {
+        return userService.save(userDto);
+    }
+
+    @PutMapping("/users/{cpf}")
+    public UserDto updateUser(@RequestBody UserDto userDto, @PathVariable("cpf") String cpf) {
+        return userService.update(userDto, cpf);
+    }
+
+    @DeleteMapping("/users/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@PathVariable("id") Long id) {
+         userService.delete(id);
     }
 }
