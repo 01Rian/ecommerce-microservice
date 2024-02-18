@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -61,6 +62,25 @@ public class UserService {
         UserEntity user = userRepository.save(mapper.mapFrom(userDto));
 
         return mapper.mapTo(user);
+    }
+
+    @Transactional
+    public UserDto update(UserDto userDto, String cpf) {
+        UserEntity existingUser = userRepository.findByCpf(cpf);
+
+        if (existingUser == null) {
+            throw new UserNotFoundException();
+        }
+
+        existingUser.setNome(Objects.requireNonNullElse(userDto.getNome(), existingUser.getNome()));
+        existingUser.setEndereco(Objects.requireNonNullElse(userDto.getEndereco(), existingUser.getEndereco()));
+        existingUser.setEmail(Objects.requireNonNullElse(userDto.getEmail(), existingUser.getEmail()));
+        existingUser.setTelefone(Objects.requireNonNullElse(userDto.getTelefone(), existingUser.getTelefone()));
+        existingUser.setDataCadastro(Objects.requireNonNullElse(userDto.getDataCadastro(), LocalDateTime.now()));
+
+        UserEntity updatedUser = userRepository.save(existingUser);
+
+        return mapper.mapTo(updatedUser);
     }
 
     @Transactional
