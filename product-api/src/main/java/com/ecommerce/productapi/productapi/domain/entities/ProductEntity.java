@@ -16,11 +16,11 @@ public class ProductEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
-    private String nome;
-    private Float preco;
-    private String descricao;
-    private String productIdentifier;
+    private Long    id;
+    private String  nome;
+    private Float   preco;
+    private String  descricao;
+    private String  productIdentifier;
 
     @ManyToOne
     @JoinColumn(name = "category_id")

@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class ProductDto {
 
+    private Long id;
     @NotBlank
     private String productIdentifier;
     @NotBlank
