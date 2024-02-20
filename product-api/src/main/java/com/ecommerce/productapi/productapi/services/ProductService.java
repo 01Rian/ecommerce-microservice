@@ -9,6 +9,8 @@ import com.ecommerce.productapi.productapi.mappers.impl.ProductMapper;
 import com.ecommerce.productapi.productapi.repositories.CategoryRepository;
 import com.ecommerce.productapi.productapi.repositories.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,6 +38,12 @@ public class ProductService {
                 .stream()
                 .map(mapper::mapTo)
                 .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public Page<ProductDto> getAllPageProducts(PageRequest page) {
+        Page<ProductEntity> products = productRepository.findAll(page);
+        return products.map(mapper::mapTo);
     }
 
     @Transactional(readOnly = true)
