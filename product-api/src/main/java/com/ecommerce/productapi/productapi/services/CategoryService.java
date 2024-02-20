@@ -2,25 +2,30 @@ package com.ecommerce.productapi.productapi.services;
 
 import com.ecommerce.productapi.productapi.domain.dto.CategoryDto;
 import com.ecommerce.productapi.productapi.domain.entities.CategoryEntity;
+import com.ecommerce.productapi.productapi.exception.CategoryNotFoundException;
 import com.ecommerce.productapi.productapi.mappers.impl.CategoryMapper;
 import com.ecommerce.productapi.productapi.repositories.CategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 public class CategoryService {
 
-    @Autowired
-    private CategoryRepository categoryRepository;
+    private final CategoryRepository categoryRepository;
+    private final CategoryMapper mapper;
 
     @Autowired
-    private CategoryMapper mapper;
+    public CategoryService(CategoryRepository categoryRepository, CategoryMapper mapper) {
+        this.categoryRepository = categoryRepository;
+        this.mapper = mapper;
+    }
 
-    public List<CategoryDto> getAll() {
+    @Transactional(readOnly = true)
+    public List<CategoryDto> getAllCategories() {
         List<CategoryEntity> categories = categoryRepository.findAll();
         return categories
                 .stream()
@@ -28,19 +33,23 @@ public class CategoryService {
                 .collect(Collectors.toList());
     }
 
-    public CategoryDto getCategoryById(long id) {
-        Optional<CategoryEntity> category = categoryRepository.findById(id);
-        return mapper.mapTo(category.get());
+    @Transactional(readOnly = true)
+    public CategoryDto getCategoryById(Long id) {
+        CategoryEntity category = categoryRepository.findById(id).orElseThrow(CategoryNotFoundException::new);
+        return mapper.mapTo(category);
     }
 
+    @Transactional
     public CategoryDto save(CategoryDto categoryDto) {
         categoryDto.setNome(categoryDto.getNome().toLowerCase());
-
         CategoryEntity category = categoryRepository.save(mapper.mapFrom(categoryDto));
-        return  mapper.mapTo(category);
+
+        return mapper.mapTo(category);
     }
 
-    public void deleteById(long id) {
+    @Transactional
+    public void deleteById(Long id) throws CategoryNotFoundException {
+        CategoryEntity category = categoryRepository.findById(id).orElseThrow(CategoryNotFoundException::new);
         categoryRepository.deleteById(id);
     }
 }
