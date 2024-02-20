@@ -17,11 +17,11 @@ public class CategoryController {
 
     @GetMapping("/categories")
     public List<CategoryDto> getAllCategories() {
-        return categoryService.getAll();
+        return categoryService.getAllCategories();
     }
 
     @GetMapping("/categories/{id}")
-    public CategoryDto getCategoryById(@PathVariable("id") long id) {
+    public CategoryDto getCategoryById(@PathVariable("id") Long id) {
         return categoryService.getCategoryById(id);
     }
 
@@ -33,7 +33,7 @@ public class CategoryController {
 
     @DeleteMapping("/categories/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteCategory(@PathVariable("id") long id) {
+    public void deleteCategory(@PathVariable("id") Long id) {
         categoryService.deleteById(id);
     }
 }

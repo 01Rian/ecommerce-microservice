@@ -16,18 +16,18 @@ public class ProductController {
     private ProductService productService;
 
     @GetMapping("/products")
-    public List<ProductDto> getProducts() {
-        return productService.getAll();
+    public List<ProductDto> getAllProducts() {
+        return productService.getAllProducts();
     }
 
     @GetMapping("/products/category/{id}")
-    public List<ProductDto> getProductByCategory(@PathVariable("id") long categoryId) {
+    public List<ProductDto> getProductByCategory(@PathVariable("id") Long categoryId) {
         return productService.getProductByCategoryId(categoryId);
     }
 
     @GetMapping("/products/{identifier}")
-    public ProductDto findById(@PathVariable("identifier") String productIdentifier) {
-        return productService.findByProductIdentifier(productIdentifier);
+    public ProductDto getProductByIdentifier(@PathVariable("identifier") String identifier) {
+        return productService.findByProductIdentifier(identifier);
     }
 
     @PostMapping("/products")
@@ -38,7 +38,7 @@ public class ProductController {
 
     @DeleteMapping("/products/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable("id") long id) {
+    public void delete(@PathVariable("id") Long id) {
         productService.delete(id);
     }
 }
