@@ -1,10 +1,12 @@
 package com.ecommerce.productapi.productapi.services;
 
 import com.ecommerce.productapi.productapi.domain.dto.ProductDto;
+import com.ecommerce.productapi.productapi.domain.entities.CategoryEntity;
 import com.ecommerce.productapi.productapi.domain.entities.ProductEntity;
 import com.ecommerce.productapi.productapi.exception.CategoryNotFoundException;
 import com.ecommerce.productapi.productapi.exception.ProductAlreadyExistsException;
 import com.ecommerce.productapi.productapi.exception.ProductNotFoundException;
+import com.ecommerce.productapi.productapi.mappers.impl.CategoryMapper;
 import com.ecommerce.productapi.productapi.mappers.impl.ProductMapper;
 import com.ecommerce.productapi.productapi.repositories.CategoryRepository;
 import com.ecommerce.productapi.productapi.repositories.ProductRepository;
@@ -15,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -22,12 +25,14 @@ public class ProductService {
 
     private final ProductRepository productRepository;
     private final ProductMapper mapper;
+    private final CategoryMapper categoryMapper;
     private final CategoryRepository categoryRepository;
 
     @Autowired
-    public ProductService(ProductRepository productRepository, ProductMapper mapper, CategoryRepository categoryRepository) {
+    public ProductService(ProductRepository productRepository, ProductMapper mapper, CategoryMapper categoryMapper, CategoryRepository categoryRepository) {
         this.productRepository = productRepository;
         this.mapper = mapper;
+        this.categoryMapper = categoryMapper;
         this.categoryRepository = categoryRepository;
     }
 
@@ -78,6 +83,26 @@ public class ProductService {
 
         ProductEntity product = productRepository.save(mapper.mapFrom(productDto));
         return mapper.mapTo(product);
+    }
+
+    @Transactional
+    public ProductDto updateProduct(ProductDto productDto, String identifier) {
+        ProductEntity existingProduct = productRepository.findByProductIdentifier(identifier.toLowerCase());
+        if (existingProduct == null) throw new ProductNotFoundException();
+
+        boolean existsCategory = categoryRepository.existsById(productDto.getCategory().getId());
+        if (!existsCategory) throw new CategoryNotFoundException();
+
+        CategoryEntity category = categoryMapper.mapFrom(productDto.getCategory());
+
+        existingProduct.setProductIdentifier(identifier.toLowerCase());
+        existingProduct.setNome(Objects.requireNonNullElse(productDto.getNome(), existingProduct.getNome().toLowerCase()));
+        existingProduct.setDescricao(Objects.requireNonNullElse(productDto.getDescricao(), existingProduct.getDescricao()));
+        existingProduct.setPreco(Objects.requireNonNullElse(productDto.getPreco(), existingProduct.getPreco()));
+        existingProduct.setCategory(category);
+
+        ProductEntity updateProduct = productRepository.save(existingProduct);
+        return mapper.mapTo(updateProduct);
     }
 
     @Transactional

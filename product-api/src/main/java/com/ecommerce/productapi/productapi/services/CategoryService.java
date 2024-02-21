@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -45,6 +47,20 @@ public class CategoryService {
         CategoryEntity category = categoryRepository.save(mapper.mapFrom(categoryDto));
 
         return mapper.mapTo(category);
+    }
+
+    @Transactional
+    public CategoryDto updateCategory(CategoryDto categoryDto, Long id) {
+        Optional<CategoryEntity> existingCategory = categoryRepository.findById(id);
+
+        if (existingCategory.isEmpty()) {
+            throw new CategoryNotFoundException();
+        }
+
+        existingCategory.get().setNome(categoryDto.getNome());
+
+        CategoryEntity updateCategory = categoryRepository.save(existingCategory.get());
+        return mapper.mapTo(updateCategory);
     }
 
     @Transactional
