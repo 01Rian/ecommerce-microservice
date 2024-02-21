@@ -51,6 +51,11 @@ public class ProductController {
         return productService.save(productDto);
     }
 
+    @PutMapping("/products/{identifier}")
+    public ProductDto updateProduct(@RequestBody ProductDto productDto, @PathVariable("identifier") String identifier) {
+        return productService.updateProduct(productDto, identifier);
+    }
+
     @DeleteMapping("/products/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable("id") Long id) {
