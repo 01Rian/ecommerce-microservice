@@ -16,6 +16,8 @@ import java.util.List;
 @Builder
 public class ShopDto {
 
+    private Long id;
+
     @NotBlank
     private String userIdentifier;
 
