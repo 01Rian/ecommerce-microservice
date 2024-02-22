@@ -1,40 +1,31 @@
 package com.ecommerce.shoppingapi.services;
 
-import com.ecommerce.shoppingapi.domain.dto.ItemDto;
-import com.ecommerce.shoppingapi.domain.dto.ProductDto;
-import com.ecommerce.shoppingapi.domain.dto.ShopDto;
-import com.ecommerce.shoppingapi.domain.dto.ShopReportDto;
+import com.ecommerce.shoppingapi.domain.dto.*;
 import com.ecommerce.shoppingapi.domain.entities.ShopEntity;
+import com.ecommerce.shoppingapi.exception.ShoppingNotFoundException;
 import com.ecommerce.shoppingapi.mappers.impl.ShopMapper;
 import com.ecommerce.shoppingapi.repositories.ShopRepository;
 import com.ecommerce.shoppingapi.repositories.impl.ReportRepositoryImpl;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class ShopService {
 
-    private ShopRepository shopRepository;
-    private ReportRepositoryImpl reportRepository;
-    private ShopMapper mapper;
-    private ProductService productService;
-    private UserService userService;
+    private final ShopRepository shopRepository;
+    private final ReportRepositoryImpl reportRepository;
+    private final ShopMapper mapper;
+    private final ProductService productService;
+    private final UserService userService;
 
-    @Autowired
-    public ShopService(ShopRepository shopRepository, ReportRepositoryImpl reportRepository, ShopMapper mapper, ProductService productService, UserService userService) {
-        this.shopRepository = shopRepository;
-        this.reportRepository = reportRepository;
-        this.mapper = mapper;
-        this.productService = productService;
-        this.userService = userService;
-    }
-
+    @Transactional(readOnly = true)
     public List<ShopDto> getAll() {
         List<ShopEntity> shops = shopRepository.findAll();
         return shops
@@ -43,6 +34,7 @@ public class ShopService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     public List<ShopDto> getByUser(String userIdentifier) {
         List<ShopEntity> shops = shopRepository.findAllByUserIdentifier(userIdentifier);
         return shops
@@ -51,6 +43,7 @@ public class ShopService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     public List<ShopDto> getByDate(ShopDto shopDto) {
         List<ShopEntity> shops = shopRepository.findAllByDateGreaterThan(shopDto.getDate());
         return shops
@@ -59,13 +52,14 @@ public class ShopService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     public ShopDto findById(Long id) {
-        Optional<ShopEntity> shop = shopRepository.findById(id);
-        return shop.map(shopEntity -> mapper.mapTo(shopEntity)).orElse(null);
+        ShopEntity shop = shopRepository.findById(id).orElseThrow(ShoppingNotFoundException::new);
+        return mapper.mapTo(shop);
     }
 
+    @Transactional
     public ShopDto save(ShopDto shopDto) {
-
         if (userService.getUserByCfp(shopDto.getUserIdentifier()) == null) {
             return null;
         }
@@ -73,6 +67,7 @@ public class ShopService {
         if (!validateProducts(shopDto.getItems())) {
             return null;
         }
+
         shopDto.setTotal(
                 shopDto.getItems()
                         .stream()
@@ -80,11 +75,11 @@ public class ShopService {
                         .reduce((float) 0, Float::sum)
         );
 
-        ShopEntity shopEntity = mapper.mapFrom(shopDto);
-        shopEntity.setDate(LocalDateTime.now());
+        ShopEntity shop = mapper.mapFrom(shopDto);
+        shop.setDate(LocalDateTime.now());
+        shopRepository.save(shop);
 
-        shopEntity = shopRepository.save(shopEntity);
-        return mapper.mapTo(shopEntity);
+        return mapper.mapTo(shop);
     }
 
     private boolean validateProducts(List<ItemDto> items) {
@@ -99,6 +94,7 @@ public class ShopService {
         return true;
     }
 
+    @Transactional(readOnly = true)
     public List<ShopDto> getShopsByFilter(LocalDate startDate, LocalDate endDate, Float maxValue) {
         List<ShopEntity> shops = reportRepository.getShopByFilters(startDate, endDate, maxValue);
         return shops
@@ -107,6 +103,7 @@ public class ShopService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     public ShopReportDto getReportByDate(LocalDate startDate, LocalDate endDate) {
         return reportRepository.getReportByDate(startDate, endDate);
     }
