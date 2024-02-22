@@ -4,7 +4,7 @@ import com.ecommerce.shoppingapi.domain.dto.ShopDto;
 import com.ecommerce.shoppingapi.domain.dto.ShopReportDto;
 import com.ecommerce.shoppingapi.services.ShopService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -12,33 +12,34 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.util.List;
 
+@RequiredArgsConstructor
 @RestController
+@RequestMapping("/shoppings")
 public class ShopController {
 
-    @Autowired
-    private ShopService shopService;
+    private final ShopService shopService;
 
-    @GetMapping("/shoppings")
-    public List<ShopDto> getShops() {
+    @GetMapping
+    public List<ShopDto> getAllShops() {
         return shopService.getAll();
     }
 
-    @GetMapping("/shoppings/shopByUser/{userIdentifier}")
-    public List<ShopDto> getShops(@PathVariable("userIdentifier") String userIdentifier) {
+    @GetMapping("/shopByUser/{userIdentifier}")
+    public List<ShopDto> getShopsByUserIdentifier(@PathVariable("userIdentifier") String userIdentifier) {
         return shopService.getByUser(userIdentifier);
     }
 
-    @GetMapping("/shoppings/shopByDate")
-    public List<ShopDto> getShops(@RequestBody ShopDto dto) {
+    @GetMapping("/shopByDate")
+    public List<ShopDto> getShopsByDate(@RequestBody ShopDto dto) {
         return shopService.getByDate(dto);
     }
 
-    @GetMapping("/shoppings/{id}")
+    @GetMapping("/{id}")
     public ShopDto findById(@PathVariable("id") Long id) {
         return shopService.findById(id);
     }
 
-    @GetMapping("/shoppings/search")
+    @GetMapping("/search")
     public List<ShopDto> getShopsByFilter
             (
             @RequestParam(name = "startDate", required = true)
@@ -50,7 +51,7 @@ public class ShopController {
         return shopService.getShopsByFilter(startDate, endDate, maxValue);
     }
 
-    @GetMapping("/shoppings/report")
+    @GetMapping("/report")
     public ShopReportDto getReportByDate
             (
             @RequestParam(name = "startDate", required = true)
@@ -61,7 +62,7 @@ public class ShopController {
         return shopService.getReportByDate(startDate, endDate);
     }
 
-    @PostMapping("/shoppings")
+    @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ShopDto newShop(@Valid @RequestBody ShopDto dto) {
         return shopService.save(dto);
