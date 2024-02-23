@@ -9,6 +9,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -54,7 +55,13 @@ public class ShopController {
             @RequestParam(name = "endDate", required = true)
             @DateTimeFormat(pattern = "dd/MM/yyyy") LocalDate endDate
             ) {
-        return shopService.getReportByDate(startDate, endDate);
+        ShopReportDto report = shopService.getReportByDate(startDate, endDate);
+
+        DecimalFormat df = new DecimalFormat("#.##");
+        String formattedMean = df.format(report.getMean()).replace(",", ".");
+        report.setMean(Double.valueOf(formattedMean));
+
+        return report;
     }
 
     @PostMapping
