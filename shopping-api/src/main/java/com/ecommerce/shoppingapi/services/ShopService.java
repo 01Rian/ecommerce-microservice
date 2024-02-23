@@ -44,15 +44,6 @@ public class ShopService {
     }
 
     @Transactional(readOnly = true)
-    public List<ShopDto> getByDate(ShopDto shopDto) {
-        List<ShopEntity> shops = shopRepository.findAllByDateGreaterThan(shopDto.getDate());
-        return shops
-                .stream()
-                .map(mapper::mapTo)
-                .collect(Collectors.toList());
-    }
-
-    @Transactional(readOnly = true)
     public ShopDto findById(Long id) {
         ShopEntity shop = shopRepository.findById(id).orElseThrow(ShoppingNotFoundException::new);
         return mapper.mapTo(shop);
