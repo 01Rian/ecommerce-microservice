@@ -29,11 +29,6 @@ public class ShopController {
         return shopService.getByUser(userIdentifier);
     }
 
-    @GetMapping("/shopByDate")
-    public List<ShopDto> getShopsByDate(@RequestBody ShopDto dto) {
-        return shopService.getByDate(dto);
-    }
-
     @GetMapping("/{id}")
     public ShopDto findById(@PathVariable("id") Long id) {
         return shopService.findById(id);
