@@ -5,6 +5,9 @@ import com.ecommerce.shoppingapi.domain.dto.ShopReportDto;
 import com.ecommerce.shoppingapi.services.ShopService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -23,6 +26,18 @@ public class ShopController {
     @GetMapping
     public List<ShopDto> getAllShops() {
         return shopService.getAll();
+    }
+
+    @GetMapping("/pageable")
+    public Page<ShopDto> getAllShopsPage(
+            @RequestParam(value = "page", defaultValue = "0") Integer page,
+            @RequestParam(value = "linesPerPage", defaultValue = "12") Integer linesPerPage,
+            @RequestParam(value = "direction", defaultValue = "ASC") String direction,
+            @RequestParam(value = "orderBy", defaultValue = "total") String orderBy
+    ) {
+        PageRequest pageRequest = PageRequest.of(page, linesPerPage, Sort.Direction.valueOf(direction), orderBy);
+
+        return shopService.getAllPage(pageRequest);
     }
 
     @GetMapping("/shopByUser/{userIdentifier}")
