@@ -69,4 +69,10 @@ public class ShopController {
     public ShopDto newShop(@Valid @RequestBody ShopDto dto) {
         return shopService.save(dto);
     }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteShop(@PathVariable("id") Long id) {
+        shopService.delete(id);
+    }
 }
