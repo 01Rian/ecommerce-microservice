@@ -49,6 +49,20 @@ public class ShopService {
         return mapper.mapTo(shop);
     }
 
+    @Transactional(readOnly = true)
+    public List<ShopDto> getShopsByFilter(LocalDate startDate, LocalDate endDate, Float maxValue) {
+        List<ShopEntity> shops = reportRepository.getShopByFilters(startDate, endDate, maxValue);
+        return shops
+                .stream()
+                .map(mapper::mapTo)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public ShopReportDto getReportByDate(LocalDate startDate, LocalDate endDate) {
+        return reportRepository.getReportByDate(startDate, endDate);
+    }
+
     @Transactional
     public ShopDto save(ShopDto shopDto) {
         if (userService.getUserByCfp(shopDto.getUserIdentifier()) == null) {
@@ -85,17 +99,12 @@ public class ShopService {
         return true;
     }
 
-    @Transactional(readOnly = true)
-    public List<ShopDto> getShopsByFilter(LocalDate startDate, LocalDate endDate, Float maxValue) {
-        List<ShopEntity> shops = reportRepository.getShopByFilters(startDate, endDate, maxValue);
-        return shops
-                .stream()
-                .map(mapper::mapTo)
-                .collect(Collectors.toList());
-    }
-
-    @Transactional(readOnly = true)
-    public ShopReportDto getReportByDate(LocalDate startDate, LocalDate endDate) {
-        return reportRepository.getReportByDate(startDate, endDate);
+    @Transactional
+    public void delete(Long id) throws ShoppingNotFoundException {
+        boolean exist = shopRepository.existsById(id);
+        if (!exist) {
+            throw new ShoppingNotFoundException();
+        }
+        shopRepository.deleteById(id);
     }
  }
