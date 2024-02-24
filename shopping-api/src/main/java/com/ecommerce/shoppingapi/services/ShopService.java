@@ -7,6 +7,8 @@ import com.ecommerce.shoppingapi.mappers.impl.ShopMapper;
 import com.ecommerce.shoppingapi.repositories.ShopRepository;
 import com.ecommerce.shoppingapi.repositories.impl.ReportRepositoryImpl;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,6 +34,12 @@ public class ShopService {
                 .stream()
                 .map(mapper::mapTo)
                 .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public Page<ShopDto> getAllPage(PageRequest page) {
+        Page<ShopEntity> shops = shopRepository.findAll(page);
+        return shops.map(mapper::mapTo);
     }
 
     @Transactional(readOnly = true)
