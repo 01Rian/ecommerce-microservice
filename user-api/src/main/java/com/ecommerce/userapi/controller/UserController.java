@@ -3,7 +3,7 @@ package com.ecommerce.userapi.controller;
 import com.ecommerce.userapi.domain.dto.UserDto;
 import com.ecommerce.userapi.service.UserService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -12,18 +12,19 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@RequiredArgsConstructor
 @RestController
+@RequestMapping("/users")
 public class UserController {
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
 
-    @GetMapping("/users")
+    @GetMapping
     public List<UserDto> getUsers() {
         return userService.getAll();
     }
 
-    @GetMapping("/users/pageable")
+    @GetMapping("/pageable")
     public Page<UserDto> getUsersPage(
             @RequestParam(value = "page", defaultValue = "0") Integer page,
             @RequestParam(value = "linesPerPage", defaultValue = "12") Integer linesPerPage,
@@ -35,35 +36,35 @@ public class UserController {
         return userService.getAllPage(pageRequest);
     }
 
-    @GetMapping("/users/{id}")
+    @GetMapping("/{id}")
     public UserDto findById(@PathVariable("id") Long id) {
         return userService.findById(id);
     }
 
-    @GetMapping("/users/cpf/{cpf}")
+    @GetMapping("/cpf/{cpf}")
     public UserDto findByCpf(@PathVariable("cpf") String cpf) {
         return userService.findByCpf(cpf);
     }
 
-    @GetMapping("/users/search")
+    @GetMapping("/search")
     public List<UserDto> queryByName(
             @RequestParam(name = "name", required = true)
             String name) {
         return userService.queryByName(name);
     }
 
-    @PostMapping("/users")
+    @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public UserDto newUser(@Valid @RequestBody UserDto userDto) {
         return userService.save(userDto);
     }
 
-    @PutMapping("/users/{cpf}")
+    @PutMapping("/{cpf}")
     public UserDto updateUser(@RequestBody UserDto userDto, @PathVariable("cpf") String cpf) {
         return userService.update(userDto, cpf);
     }
 
-    @DeleteMapping("/users/{id}")
+    @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable("id") Long id) {
          userService.delete(id);
