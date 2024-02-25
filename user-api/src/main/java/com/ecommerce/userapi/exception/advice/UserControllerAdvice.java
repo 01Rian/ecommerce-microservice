@@ -1,7 +1,7 @@
 package com.ecommerce.userapi.exception.advice;
 
 import com.ecommerce.userapi.domain.dto.ErrorDto;
-import com.ecommerce.userapi.exception.UserBadRequestException;
+import com.ecommerce.userapi.exception.UserAlreadyExistsException;
 import com.ecommerce.userapi.exception.UserNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -27,8 +27,8 @@ public class UserControllerAdvice {
 
     @ResponseBody
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(UserBadRequestException.class)
-    public ErrorDto handleUserBadRequestException(UserBadRequestException exception) {
+    @ExceptionHandler(UserAlreadyExistsException.class)
+    public ErrorDto handleUserAlreadyExistsException(UserAlreadyExistsException exception) {
         ErrorDto errorDto = new ErrorDto();
         errorDto.setStatus(HttpStatus.BAD_REQUEST.value());
         errorDto.setMessage("User Already Exists");
