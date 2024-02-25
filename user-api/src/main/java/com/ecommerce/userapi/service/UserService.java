@@ -2,11 +2,11 @@ package com.ecommerce.userapi.service;
 
 import com.ecommerce.userapi.domain.dto.UserDto;
 import com.ecommerce.userapi.domain.entity.UserEntity;
-import com.ecommerce.userapi.exception.UserBadRequestException;
+import com.ecommerce.userapi.exception.UserAlreadyExistsException;
 import com.ecommerce.userapi.exception.UserNotFoundException;
 import com.ecommerce.userapi.mapper.impl.MapperImpl;
 import com.ecommerce.userapi.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -17,17 +17,12 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+@RequiredArgsConstructor
 @Service
 public class UserService {
 
     private final UserRepository userRepository;
     private final MapperImpl mapper;
-
-    @Autowired
-    public UserService(UserRepository userRepository, MapperImpl mapper) {
-        this.userRepository = userRepository;
-        this.mapper = mapper;
-    }
 
     @Transactional(readOnly = true)
     public List<UserDto> getAll() {
@@ -54,7 +49,7 @@ public class UserService {
         UserEntity ifExist = userRepository.findByCpf(userDto.getCpf());
 
         if (ifExist != null) {
-            throw new UserBadRequestException();
+            throw new UserAlreadyExistsException();
         }
 
         userDto.setNome(userDto.getNome().toLowerCase());
@@ -72,7 +67,7 @@ public class UserService {
             throw new UserNotFoundException();
         }
 
-        existingUser.setNome(Objects.requireNonNullElse(userDto.getNome(), existingUser.getNome()));
+        existingUser.setNome(Objects.requireNonNullElse(userDto.getNome(), existingUser.getNome().toLowerCase()));
         existingUser.setEndereco(Objects.requireNonNullElse(userDto.getEndereco(), existingUser.getEndereco()));
         existingUser.setEmail(Objects.requireNonNullElse(userDto.getEmail(), existingUser.getEmail()));
         existingUser.setTelefone(Objects.requireNonNullElse(userDto.getTelefone(), existingUser.getTelefone()));
