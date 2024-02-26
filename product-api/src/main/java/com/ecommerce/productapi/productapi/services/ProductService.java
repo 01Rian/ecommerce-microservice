@@ -10,7 +10,7 @@ import com.ecommerce.productapi.productapi.mappers.impl.CategoryMapper;
 import com.ecommerce.productapi.productapi.mappers.impl.ProductMapper;
 import com.ecommerce.productapi.productapi.repositories.CategoryRepository;
 import com.ecommerce.productapi.productapi.repositories.ProductRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+@RequiredArgsConstructor
 @Service
 public class ProductService {
 
@@ -27,14 +28,6 @@ public class ProductService {
     private final ProductMapper mapper;
     private final CategoryMapper categoryMapper;
     private final CategoryRepository categoryRepository;
-
-    @Autowired
-    public ProductService(ProductRepository productRepository, ProductMapper mapper, CategoryMapper categoryMapper, CategoryRepository categoryRepository) {
-        this.productRepository = productRepository;
-        this.mapper = mapper;
-        this.categoryMapper = categoryMapper;
-        this.categoryRepository = categoryRepository;
-    }
 
     @Transactional(readOnly = true)
     public List<ProductDto> getAllProducts() {

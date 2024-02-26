@@ -5,26 +5,20 @@ import com.ecommerce.productapi.productapi.domain.entities.CategoryEntity;
 import com.ecommerce.productapi.productapi.exception.CategoryNotFoundException;
 import com.ecommerce.productapi.productapi.mappers.impl.CategoryMapper;
 import com.ecommerce.productapi.productapi.repositories.CategoryRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@RequiredArgsConstructor
 @Service
 public class CategoryService {
 
     private final CategoryRepository categoryRepository;
     private final CategoryMapper mapper;
-
-    @Autowired
-    public CategoryService(CategoryRepository categoryRepository, CategoryMapper mapper) {
-        this.categoryRepository = categoryRepository;
-        this.mapper = mapper;
-    }
 
     @Transactional(readOnly = true)
     public List<CategoryDto> getAllCategories() {

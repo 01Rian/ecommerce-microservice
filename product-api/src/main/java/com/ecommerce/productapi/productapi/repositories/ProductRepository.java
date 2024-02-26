@@ -12,7 +12,7 @@ import java.util.List;
 public interface ProductRepository extends JpaRepository<ProductEntity, Long> {
 
     @Query(value = "SELECT p FROM ProductEntity p JOIN p.category c WHERE c.id = :categoryId")
-    public List<ProductEntity> getProductByCategory(@Param("categoryId") long categoryId);
+    List<ProductEntity> getProductByCategory(@Param("categoryId") long categoryId);
 
-    public ProductEntity findByProductIdentifier(String productIdentifier);
+    ProductEntity findByProductIdentifier(String productIdentifier);
 }
