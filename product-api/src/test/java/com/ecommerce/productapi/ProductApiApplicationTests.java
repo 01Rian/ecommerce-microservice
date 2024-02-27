@@ -1,4 +1,4 @@
-package com.ecommerce.productapi.productapi;
+package com.ecommerce.productapi;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
