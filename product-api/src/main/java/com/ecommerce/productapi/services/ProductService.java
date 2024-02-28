@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -60,8 +61,11 @@ public class ProductService {
 
     @Transactional
     public ProductDto save(ProductDto productDto) {
-        productDto.setProductIdentifier(productDto.getProductIdentifier().toLowerCase());
-        productDto.setName(productDto.getName().toLowerCase());
+        if (productDto.getProductIdentifier().isEmpty()) {
+            productDto.setProductIdentifier(UUID.randomUUID().toString());
+        } else {
+            productDto.setProductIdentifier(productDto.getProductIdentifier().toLowerCase());
+        }
 
         Product existingProduct = productRepository.findByProductIdentifier(productDto.getProductIdentifier());
         if (existingProduct != null) throw new ProductAlreadyExistsException();
@@ -69,6 +73,7 @@ public class ProductService {
         boolean existsCategory = categoryRepository.existsById(productDto.getCategory().getId());
         if (!existsCategory) throw new CategoryNotFoundException();
 
+        productDto.setName(productDto.getName().toLowerCase());
         Product product = productRepository.save(mapper.mapFrom(productDto));
         return mapper.mapTo(product);
     }
@@ -83,14 +88,18 @@ public class ProductService {
 
         Category category = categoryMapper.mapFrom(productDto.getCategory());
 
+        setFields(productDto, identifier, existingProduct, category);
+
+        Product updateProduct = productRepository.save(existingProduct);
+        return mapper.mapTo(updateProduct);
+    }
+
+    private static void setFields(ProductDto productDto, String identifier, Product existingProduct, Category category) {
         existingProduct.setProductIdentifier(identifier.toLowerCase());
         existingProduct.setName(Objects.requireNonNullElse(productDto.getName(), existingProduct.getName().toLowerCase()));
         existingProduct.setDescription(Objects.requireNonNullElse(productDto.getDescription(), existingProduct.getDescription()));
         existingProduct.setPrice(Objects.requireNonNullElse(productDto.getPrice(), existingProduct.getPrice()));
         existingProduct.setCategory(category);
-
-        Product updateProduct = productRepository.save(existingProduct);
-        return mapper.mapTo(updateProduct);
     }
 
     @Transactional
