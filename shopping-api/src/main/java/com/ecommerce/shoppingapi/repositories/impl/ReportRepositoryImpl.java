@@ -1,7 +1,7 @@
 package com.ecommerce.shoppingapi.repositories.impl;
 
 import com.ecommerce.shoppingapi.domain.dto.ShopReportDto;
-import com.ecommerce.shoppingapi.domain.entities.ShopEntity;
+import com.ecommerce.shoppingapi.domain.entities.Shop;
 import com.ecommerce.shoppingapi.repositories.ReportRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -16,10 +16,10 @@ public class ReportRepositoryImpl implements ReportRepository {
     private EntityManager entityManager;
 
     @Override
-    public List<ShopEntity> getShopByFilters(LocalDate startDate, LocalDate endDate, Float maxValue) {
+    public List<Shop> getShopByFilters(LocalDate startDate, LocalDate endDate, Float maxValue) {
         StringBuilder sb = new StringBuilder();
         sb.append("SELECT s ");
-        sb.append("FROM ShopEntity s ");
+        sb.append("FROM Shop s ");
         sb.append("WHERE s.date >= :startDate ");
 
         if (endDate != null) {
