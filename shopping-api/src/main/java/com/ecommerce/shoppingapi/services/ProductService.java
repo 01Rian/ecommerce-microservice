@@ -1,6 +1,6 @@
 package com.ecommerce.shoppingapi.services;
 
-import com.ecommerce.shoppingapi.domain.dto.ProductDto;
+import com.ecommerce.shoppingapi.domain.dto.product.ProductDto;
 import com.ecommerce.shoppingapi.exception.ProductNotFoundException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;

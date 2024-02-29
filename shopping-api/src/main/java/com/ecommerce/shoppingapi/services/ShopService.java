@@ -1,6 +1,7 @@
 package com.ecommerce.shoppingapi.services;
 
 import com.ecommerce.shoppingapi.domain.dto.*;
+import com.ecommerce.shoppingapi.domain.dto.product.ProductDto;
 import com.ecommerce.shoppingapi.domain.entities.ShopEntity;
 import com.ecommerce.shoppingapi.exception.ShoppingNotFoundException;
 import com.ecommerce.shoppingapi.mappers.impl.ShopMapper;
@@ -102,7 +103,7 @@ public class ShopService {
             if (productDto == null) {
                 return false;
             }
-            item.setPrice(productDto.getPreco());
+            item.setPrice(productDto.getPrice());
         }
         return true;
     }
