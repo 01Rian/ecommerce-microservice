@@ -2,7 +2,7 @@ package com.ecommerce.shoppingapi.services;
 
 import com.ecommerce.shoppingapi.domain.dto.*;
 import com.ecommerce.shoppingapi.domain.dto.product.ProductDto;
-import com.ecommerce.shoppingapi.domain.entities.ShopEntity;
+import com.ecommerce.shoppingapi.domain.entities.Shop;
 import com.ecommerce.shoppingapi.exception.ShoppingNotFoundException;
 import com.ecommerce.shoppingapi.mappers.impl.ShopMapper;
 import com.ecommerce.shoppingapi.repositories.ShopRepository;
@@ -30,7 +30,7 @@ public class ShopService {
 
     @Transactional(readOnly = true)
     public List<ShopDto> getAll() {
-        List<ShopEntity> shops = shopRepository.findAll();
+        List<Shop> shops = shopRepository.findAll();
         return shops
                 .stream()
                 .map(mapper::mapTo)
@@ -39,13 +39,13 @@ public class ShopService {
 
     @Transactional(readOnly = true)
     public Page<ShopDto> getAllPage(PageRequest page) {
-        Page<ShopEntity> shops = shopRepository.findAll(page);
+        Page<Shop> shops = shopRepository.findAll(page);
         return shops.map(mapper::mapTo);
     }
 
     @Transactional(readOnly = true)
     public List<ShopDto> getByUser(String userIdentifier) {
-        List<ShopEntity> shops = shopRepository.findAllByUserIdentifier(userIdentifier);
+        List<Shop> shops = shopRepository.findAllByUserIdentifier(userIdentifier);
         return shops
                 .stream()
                 .map(mapper::mapTo)
@@ -54,13 +54,13 @@ public class ShopService {
 
     @Transactional(readOnly = true)
     public ShopDto findById(Long id) {
-        ShopEntity shop = shopRepository.findById(id).orElseThrow(ShoppingNotFoundException::new);
+        Shop shop = shopRepository.findById(id).orElseThrow(ShoppingNotFoundException::new);
         return mapper.mapTo(shop);
     }
 
     @Transactional(readOnly = true)
     public List<ShopDto> getShopsByFilter(LocalDate startDate, LocalDate endDate, Float maxValue) {
-        List<ShopEntity> shops = reportRepository.getShopByFilters(startDate, endDate, maxValue);
+        List<Shop> shops = reportRepository.getShopByFilters(startDate, endDate, maxValue);
         return shops
                 .stream()
                 .map(mapper::mapTo)
@@ -89,7 +89,7 @@ public class ShopService {
                         .reduce((float) 0, Float::sum)
         );
 
-        ShopEntity shop = mapper.mapFrom(shopDto);
+        Shop shop = mapper.mapFrom(shopDto);
         shop.setDate(LocalDateTime.now());
         shopRepository.save(shop);
 
