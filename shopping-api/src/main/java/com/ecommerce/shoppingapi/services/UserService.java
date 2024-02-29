@@ -1,6 +1,6 @@
 package com.ecommerce.shoppingapi.services;
 
-import com.ecommerce.shoppingapi.domain.dto.UserDto;
+import com.ecommerce.shoppingapi.domain.dto.user.UserDto;
 import com.ecommerce.shoppingapi.exception.UserNotFoundException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
