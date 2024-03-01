@@ -5,46 +5,40 @@ import com.ecommerce.shoppingapi.exception.ProductNotFoundException;
 import com.ecommerce.shoppingapi.exception.ShoppingNotFoundException;
 import com.ecommerce.shoppingapi.exception.UserNotFoundException;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ControllerAdvice;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 
-@ControllerAdvice(basePackages = "com.ecommerce.shoppingapi.controllers")
+@RestControllerAdvice(basePackages = "com.ecommerce.shoppingapi.controllers")
 public class ShoppingControllerAdvice {
 
-    @ResponseBody
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(ProductNotFoundException.class)
-    public ErrorDto handleProductNotFound(ProductNotFoundException exception) {
-        ErrorDto errorDto = new ErrorDto();
-        errorDto.setStatus(HttpStatus.NOT_FOUND.value());
-        errorDto.setMessage("Product Not Found");
-        errorDto.setTimestamp(LocalDateTime.now());
-        return errorDto;
+    public ErrorDto handleProductNotFoundException(ProductNotFoundException exception) {
+        return ErrorDto.builder()
+                .status(HttpStatus.NOT_FOUND.value())
+                .message("Product Not Found")
+                .timestamp(LocalDateTime.now())
+                .build();
     }
 
-    @ResponseBody
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(UserNotFoundException.class)
-    public ErrorDto handleCategoryNotFound(UserNotFoundException exception) {
-        ErrorDto errorDto = new ErrorDto();
-        errorDto.setStatus(HttpStatus.NOT_FOUND.value());
-        errorDto.setMessage("User Not Found");
-        errorDto.setTimestamp(LocalDateTime.now());
-        return errorDto;
+    public ErrorDto handleCategoryNotFoundException(UserNotFoundException exception) {
+        return ErrorDto.builder()
+                .status(HttpStatus.NOT_FOUND.value())
+                .message("User Not Found")
+                .timestamp(LocalDateTime.now())
+                .build();
     }
 
-    @ResponseBody
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(ShoppingNotFoundException.class)
-    public ErrorDto handleShoppingNotFound(ShoppingNotFoundException exception) {
-        ErrorDto errorDto = new ErrorDto();
-        errorDto.setStatus(HttpStatus.NOT_FOUND.value());
-        errorDto.setMessage("Shopping Not Found");
-        errorDto.setTimestamp(LocalDateTime.now());
-        return errorDto;
+    public ErrorDto handleShoppingNotFoundException(ShoppingNotFoundException exception) {
+        return ErrorDto.builder()
+                .status(HttpStatus.NOT_FOUND.value())
+                .message("Shopping Not Found")
+                .timestamp(LocalDateTime.now())
+                .build();
     }
 }
