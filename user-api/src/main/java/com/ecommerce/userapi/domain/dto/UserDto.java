@@ -15,15 +15,15 @@ import java.time.LocalDateTime;
 public class UserDto {
 
     @NotBlank
-    private String nome;
+    private String name;
     @NotBlank
     private String cpf;
     @NotBlank
-    private String endereco;
+    private String address;
     @NotBlank
     private String email;
     @NotBlank
-    private String telefone;
+    private String phone;
 
-    private LocalDateTime dataCadastro;
+    private LocalDateTime dataRegister;
 }
