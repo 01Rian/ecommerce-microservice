@@ -91,11 +91,12 @@ public class UserService {
     }
 
     private static void setFields(UserDto userDto, User existingUser) {
+        existingUser.setCpf(Objects.requireNonNullElse(userDto.getCpf(), existingUser.getCpf()));
         existingUser.setName(Objects.requireNonNullElse(userDto.getName(), existingUser.getName().toLowerCase()));
         existingUser.setAddress(Objects.requireNonNullElse(userDto.getAddress(), existingUser.getAddress()));
         existingUser.setEmail(Objects.requireNonNullElse(userDto.getEmail(), existingUser.getEmail()));
         existingUser.setPhone(Objects.requireNonNullElse(userDto.getPhone(), existingUser.getPhone()));
-        existingUser.setDataRegister(Objects.requireNonNullElse(userDto.getDataRegister(), LocalDateTime.now()));
+        existingUser.setDataRegister(Objects.requireNonNullElse(userDto.getDataRegister(), existingUser.getDataRegister()));
     }
 
     @Transactional
