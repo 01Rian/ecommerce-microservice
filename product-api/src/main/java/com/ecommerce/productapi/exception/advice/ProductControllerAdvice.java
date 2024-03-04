@@ -6,18 +6,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.ControllerAdvice;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-@ControllerAdvice(basePackages = "com.ecommerce.productapi.controllers")
+@RestControllerAdvice(basePackages = "com.ecommerce.productapi.controllers")
 public class ProductControllerAdvice {
 
-    @ResponseBody
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(ProductNotFoundException.class)
     public ErrorDto handleProductNotFoundException(ProductNotFoundException exception) {
@@ -28,7 +24,6 @@ public class ProductControllerAdvice {
                 .build();
     }
 
-    @ResponseBody
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(CategoryNotFoundException.class)
     public ErrorDto handleCategoryNotFoundException(CategoryNotFoundException exception) {
@@ -39,7 +34,6 @@ public class ProductControllerAdvice {
                 .build();
     }
 
-    @ResponseBody
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(ProductAlreadyExistsException.class)
     public ErrorDto handleProductAlreadyExistsException(ProductAlreadyExistsException exception) {
@@ -50,7 +44,6 @@ public class ProductControllerAdvice {
                 .build();
     }
 
-    @ResponseBody
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ErrorDto handleArgumentNotValidException(MethodArgumentNotValidException exception) {
