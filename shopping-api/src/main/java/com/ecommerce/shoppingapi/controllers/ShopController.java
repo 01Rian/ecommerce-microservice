@@ -51,8 +51,7 @@ public class ShopController {
     }
 
     @GetMapping("/search")
-    public List<ShopDto> getShopsByFilter
-            (
+    public List<ShopDto> getShopsByFilter(
             @RequestParam(name = "startDate", required = true)
             @DateTimeFormat(pattern = "dd/MM/yyyy") LocalDate startDate,
             @RequestParam(name = "endDate", required = false)
@@ -63,8 +62,7 @@ public class ShopController {
     }
 
     @GetMapping("/report")
-    public ShopReportDto getReportByDate
-            (
+    public ShopReportDto getReportByDate(
             @RequestParam(name = "startDate", required = true)
             @DateTimeFormat(pattern = "dd/MM/yyyy") LocalDate startDate,
             @RequestParam(name = "endDate", required = true)
@@ -72,9 +70,14 @@ public class ShopController {
             ) {
         ShopReportDto report = shopService.getReportByDate(startDate, endDate);
 
-        DecimalFormat df = new DecimalFormat("#.##");
-        String formattedMean = df.format(report.getMean()).replace(",", ".");
-        report.setMean(Double.valueOf(formattedMean));
+        if (report.getCount() != 0) {
+            DecimalFormat df = new DecimalFormat("#.##");
+            String formattedMean = df.format(report.getMean()).replace(",", ".");
+            report.setMean(Double.valueOf(formattedMean));
+        } else {
+            report.setMean(0.0);
+            report.setTotal(0.0);
+        }
 
         return report;
     }
