@@ -2,10 +2,9 @@ package com.ecommerce.shoppingapi.services;
 
 import com.ecommerce.shoppingapi.domain.dto.user.UserDto;
 import com.ecommerce.shoppingapi.exception.UserNotFoundException;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 @Service
 public class UserService {
@@ -13,12 +12,20 @@ public class UserService {
     public UserDto getUserByCfp(String cpf) {
 
         try {
-            RestTemplate restTemplate = new RestTemplate();
-            String url = "http://localhost:8080/api/users/cpf/" + cpf;
-            ResponseEntity<UserDto> response = restTemplate.getForEntity(url, UserDto.class);
+            String productApi = "http://localhost:8080/api/users";
 
-            return response.getBody();
-        } catch (HttpClientErrorException.NotFound e) {
+            WebClient webClient = WebClient.builder()
+                    .baseUrl(productApi)
+                    .build();
+
+            Mono<UserDto> user = webClient.get()
+                    .uri("/cpf/" + cpf)
+                    .retrieve()
+                    .bodyToMono(UserDto.class);
+
+            return user.block();
+        } catch (Exception e) {
+            e.printStackTrace();
             throw new UserNotFoundException();
         }
     }

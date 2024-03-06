@@ -2,10 +2,9 @@ package com.ecommerce.shoppingapi.services;
 
 import com.ecommerce.shoppingapi.domain.dto.product.ProductDto;
 import com.ecommerce.shoppingapi.exception.ProductNotFoundException;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 @Service
 public class ProductService {
@@ -13,12 +12,20 @@ public class ProductService {
     public ProductDto getProductByIdentifier(String productIdentifier) {
 
         try {
-            RestTemplate restTemplate = new RestTemplate();
-            String url = "http://localhost:8081/api/products/" + productIdentifier;
-            ResponseEntity<ProductDto> response = restTemplate.getForEntity(url, ProductDto.class);
+            String productApi = "http://localhost:8081/api";
 
-            return response.getBody();
-        } catch (HttpClientErrorException.NotFound e) {
+            WebClient webClient = WebClient.builder()
+                    .baseUrl(productApi)
+                    .build();
+
+            Mono<ProductDto> product = webClient.get()
+                    .uri("/products/" + productIdentifier)
+                    .retrieve()
+                    .bodyToMono(ProductDto.class);
+
+            return product.block();
+        } catch (Exception e) {
+            e.printStackTrace();
             throw new ProductNotFoundException();
         }
     }
