@@ -5,6 +5,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    image: shopping-api
+    container_name: shopping-api
     ports:
       - "8082:8082"
     depends_on:
@@ -16,9 +18,15 @@ services:
 
   postgres:
     image: postgres:16.2
+    container_name: shopping-db
     ports:
       - "5434:5432"
     environment:
       POSTGRES_DB: dev
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: postgres
+
+networks:
+  default:
+    external: true
+    name: ecommerce
