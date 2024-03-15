@@ -5,6 +5,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    image: product-api
+    container_name: product-api
     ports:
       - "8081:8081"
     depends_on:
@@ -16,9 +18,15 @@ services:
 
   postgres:
     image: postgres:16.2
+    container_name: product-db
     ports:
       - "5433:5432"
     environment:
       POSTGRES_DB: dev
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: postgres
+
+networks:
+  default:
+    external: true
+    name: ecommerce
