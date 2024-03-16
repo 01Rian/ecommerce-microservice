@@ -12,7 +12,7 @@ public class ProductService {
     public ProductDto getProductByIdentifier(String productIdentifier) {
 
         try {
-            String productApi = "http://localhost:8081/api";
+            String productApi = "http://product-api:8081/api";
 
             WebClient webClient = WebClient.builder()
                     .baseUrl(productApi)
