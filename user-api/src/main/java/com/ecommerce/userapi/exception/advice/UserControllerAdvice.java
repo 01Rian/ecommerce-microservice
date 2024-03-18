@@ -25,7 +25,7 @@ public class UserControllerAdvice {
     @ExceptionHandler(UserAlreadyExistsException.class)
     public ErrorDto handleUserAlreadyExistsException(UserAlreadyExistsException exception) {
         return ErrorDto.builder()
-                .status(HttpStatus.NOT_FOUND.value())
+                .status(HttpStatus.BAD_REQUEST.value())
                 .message("User Already Exists")
                 .timestamp(LocalDateTime.now())
                 .build();
