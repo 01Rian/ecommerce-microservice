@@ -27,3 +27,22 @@
    docker compose up -d
     ```
    This will initialize the microservices needed for the Ecommerce application.
+
+## Swagger
+
+To access the swagger docs access the endpoints:
+
+1. User API
+   ```bash
+   http://localhost:8080/api/v1/swagger-ui/index.html
+   ```
+
+2. Product API
+   ```bash
+   http://localhost:8081/api/v1/swagger-ui/index.html
+   ```
+
+3. Shopping API
+   ```bash
+   http://localhost:8082/api/v1/swagger-ui/index.html
+   ```
