@@ -12,7 +12,7 @@ public class UserService {
     public UserDto getUserByCfp(String cpf) {
 
         try {
-            String productApi = "http://user-api:8080/api/users";
+            String productApi = "http://user-api:8080/api/v1/users";
 
             WebClient webClient = WebClient.builder()
                     .baseUrl(productApi)
