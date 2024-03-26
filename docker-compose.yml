@@ -1,0 +1,19 @@
+version: '3.9'
+
+services:
+
+  postgres:
+    image: postgres:16.2
+    container_name: ecommerce-db
+    ports:
+      - "5432:5432"
+    volumes:
+      - "./:/docker-entrypoint-initdb.d"
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: postgres
+
+networks:
+  default:
+    external: true
+    name: ecommerce
