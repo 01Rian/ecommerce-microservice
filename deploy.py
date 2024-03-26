@@ -2,9 +2,12 @@ import os
 
 script_dir = os.path.dirname(__file__)
 
-base_dirs = [os.path.join(script_dir, "product-api/"),
+base_dirs = [
+             script_dir,
+             os.path.join(script_dir, "product-api/"),
              os.path.join(script_dir, "shopping-api/"),
-             os.path.join(script_dir, "user-api/")]
+             os.path.join(script_dir, "user-api/")
+             ]
 
 for base_dir in base_dirs:
     compose_file = os.path.join(base_dir, "docker-compose.yml")
