@@ -9,22 +9,10 @@ services:
     container_name: shopping-api
     ports:
       - "8082:8082"
-    depends_on:
-      - postgres
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/dev
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/shopping
       SPRING_DATASOURCE_USERNAME: admin
       SPRING_DATASOURCE_PASSWORD: postgres
-
-  postgres:
-    image: postgres:16.2
-    container_name: shopping-db
-    ports:
-      - "5434:5432"
-    environment:
-      POSTGRES_DB: dev
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: postgres
 
 networks:
   default:
