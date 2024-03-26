@@ -9,22 +9,10 @@ services:
     container_name: user-api
     ports:
       - "8080:8080"
-    depends_on:
-      - postgres
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/dev
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/user
       SPRING_DATASOURCE_USERNAME: admin
       SPRING_DATASOURCE_PASSWORD: postgres
-
-  postgres:
-    image: postgres:16.2
-    container_name: user-db
-    ports:
-      - "5432:5432"
-    environment:
-      POSTGRES_DB: dev
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: postgres
 
 networks:
   default:
