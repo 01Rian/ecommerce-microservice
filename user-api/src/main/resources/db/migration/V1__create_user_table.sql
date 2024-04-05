@@ -1,6 +1,6 @@
 CREATE SCHEMA IF NOT EXISTS users;
 
-CREATE TABLE users.user (
+CREATE TABLE users."user" (
     id BIGSERIAL PRIMARY KEY,
     name VARCHAR(50) NOT NULL,
     cpf VARCHAR(11) NOT NULL,
