@@ -1,5 +1,4 @@
 FROM maven:3.9.6-eclipse-temurin-17
-MAINTAINER Rian Santos
 WORKDIR /app
 COPY ./pom.xml /app/pom.xml
 RUN mvn -B dependency:resolve dependency:resolve-plugins
