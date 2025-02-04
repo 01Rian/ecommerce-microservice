@@ -7,5 +7,6 @@ CREATE TABLE users."user" (
     address VARCHAR(50) NOT NULL,
     email VARCHAR(50) NOT NULL,
     phone VARCHAR(50) NOT NULL,
-    data_register TIMESTAMP NOT NULL
+    data_register TIMESTAMP NOT NULL,
+    UNIQUE(cpf)
 );
