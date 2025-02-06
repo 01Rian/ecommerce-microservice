@@ -1,6 +1,7 @@
 package com.ecommerce.userapi.controller;
 
-import com.ecommerce.userapi.domain.dto.UserDto;
+import com.ecommerce.userapi.domain.dto.UserRequestDto;
+import com.ecommerce.userapi.domain.dto.UserResponseDto;
 import com.ecommerce.userapi.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -21,12 +22,12 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping
-    public ResponseEntity<List<UserDto>> findAll() {
+    public ResponseEntity<List<UserResponseDto>> findAll() {
         return ResponseEntity.ok(userService.findAll());
     }
 
     @GetMapping("/pageable")
-    public ResponseEntity<Page<UserDto>> findByPage(
+    public ResponseEntity<Page<UserResponseDto>> findByPage(
             @RequestParam(value = "page", defaultValue = "0") Integer page,
             @RequestParam(value = "linesPerPage", defaultValue = "12") Integer linesPerPage,
             @RequestParam(value = "direction", defaultValue = "ASC") String direction,
@@ -37,31 +38,31 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserDto> findById(@PathVariable("id") Long id) {
+    public ResponseEntity<UserResponseDto> findById(@PathVariable("id") Long id) {
         return ResponseEntity.ok(userService.findById(id));
     }
 
     @GetMapping("/cpf/{cpf}")
-    public ResponseEntity<UserDto> findByCpf(@PathVariable("cpf") String cpf) {
+    public ResponseEntity<UserResponseDto> findByCpf(@PathVariable("cpf") String cpf) {
         return ResponseEntity.ok(userService.findByCpf(cpf));
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<UserDto>> findByQueryName(
+    public ResponseEntity<List<UserResponseDto>> findByQueryName(
             @RequestParam(name = "name", required = true)
             String name) {
         return ResponseEntity.ok(userService.findByQueryName(name));
     }
 
     @PostMapping
-    public ResponseEntity<UserDto> createUser(@Valid @RequestBody UserDto userDto) {
+    public ResponseEntity<UserResponseDto> createUser(@Valid @RequestBody UserRequestDto userRequestDto) {
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(userService.save(userDto));
+                .body(userService.save(userRequestDto));
     }
 
     @PutMapping("/{cpf}")
-    public ResponseEntity<UserDto> updateUser(@RequestBody UserDto userDto, @PathVariable("cpf") String cpf) {
-        return ResponseEntity.ok(userService.update(userDto, cpf));
+    public ResponseEntity<UserResponseDto> updateUser(@RequestBody UserRequestDto userRequestDto, @PathVariable("cpf") String cpf) {
+        return ResponseEntity.ok(userService.update(userRequestDto, cpf));
     }
 
     @DeleteMapping("/{id}")
