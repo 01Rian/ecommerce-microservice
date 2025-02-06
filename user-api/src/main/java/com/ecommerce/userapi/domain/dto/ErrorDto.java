@@ -1,19 +1,21 @@
 package com.ecommerce.userapi.domain.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-@Builder
-public class ErrorDto {
-
-    private Integer status;
-    private String message;
-    private LocalDateTime timestamp;
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public record ErrorDto(
+        int status,
+        String message,
+        String errorCode,
+        @JsonFormat(pattern = "dd-MM-yyyy HH:mm:ss")
+        LocalDateTime timestamp,
+        Map<String, String> errors
+) {
+    public ErrorDto(int status, String message, String errorCode, LocalDateTime timestamp) {
+        this(status, message, errorCode, timestamp, null);
+    }
 }
