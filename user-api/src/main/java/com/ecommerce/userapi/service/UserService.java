@@ -1,6 +1,7 @@
 package com.ecommerce.userapi.service;
 
-import com.ecommerce.userapi.domain.dto.UserDto;
+import com.ecommerce.userapi.domain.dto.UserRequestDto;
+import com.ecommerce.userapi.domain.dto.UserResponseDto;
 import com.ecommerce.userapi.domain.entity.User;
 import com.ecommerce.userapi.exception.UserAlreadyExistsException;
 import com.ecommerce.userapi.exception.UserNotFoundException;
@@ -25,7 +26,7 @@ public class UserService {
     private final MapperImpl mapper;
 
     @Transactional(readOnly = true)
-    public List<UserDto> getAll() {
+    public List<UserResponseDto> findAll() {
         List<User> users = userRepository.findAll();
         return users.stream()
                 .map(mapper::mapTo)
@@ -33,28 +34,28 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public Page<UserDto> getAllPage(PageRequest page) {
+    public Page<UserResponseDto> findByPage(PageRequest page) {
         Page<User> users = userRepository.findAll(page);
         return users.map(mapper::mapTo);
     }
 
     @Transactional(readOnly = true)
-    public UserDto findById(Long userId) {
-        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+    public UserResponseDto findById(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("id", userId));
         return mapper.mapTo(user);
     }
 
     @Transactional(readOnly = true)
-    public UserDto findByCpf(String cpf) {
+    public UserResponseDto findByCpf(String cpf) {
         User user = userRepository.findByCpf(cpf);
         if (user != null) {
             return mapper.mapTo(user);
         }
-        throw new UserNotFoundException();
+        throw new UserNotFoundException("cpf", cpf);
     }
 
     @Transactional(readOnly = true)
-    public List<UserDto> queryByName(String name) {
+    public List<UserResponseDto> findByQueryName(String name) {
         List<User> users = userRepository.queryByNameLike(name);
         return users.stream()
                 .map(mapper::mapTo)
@@ -62,46 +63,46 @@ public class UserService {
     }
 
     @Transactional
-    public UserDto save(UserDto userDto) {
-        User ifExist = userRepository.findByCpf(userDto.getCpf());
+    public UserResponseDto save(UserRequestDto userRequestDto) {
+        User ifExist = userRepository.findByCpf(userRequestDto.getCpf());
 
         if (ifExist != null) {
-            throw new UserAlreadyExistsException();
+            throw new UserAlreadyExistsException("cpf", userRequestDto.getCpf());
         }
 
-        userDto.setName(userDto.getName().toLowerCase());
-        userDto.setDataRegister(LocalDateTime.now());
-        User user = userRepository.save(mapper.mapFrom(userDto));
-
-        return mapper.mapTo(user);
+        User user = mapper.mapFrom(userRequestDto);
+        user.setName(user.getName().toLowerCase());
+        user.setDataRegister(LocalDateTime.now());
+        
+        User savedUser = userRepository.save(user);
+        return mapper.mapTo(savedUser);
     }
 
     @Transactional
-    public UserDto update(UserDto userDto, String cpf) {
+    public UserResponseDto update(UserRequestDto userRequestDto, String cpf) {
         User existingUser = userRepository.findByCpf(cpf);
 
         if (existingUser == null) {
-            throw new UserNotFoundException();
+            throw new UserNotFoundException("cpf", cpf);
         }
 
-        setFields(userDto, existingUser);
+        setFields(userRequestDto, existingUser);
 
         User updatedUser = userRepository.save(existingUser);
         return mapper.mapTo(updatedUser);
     }
 
-    private static void setFields(UserDto userDto, User existingUser) {
-        existingUser.setCpf(Objects.requireNonNullElse(userDto.getCpf(), existingUser.getCpf()));
-        existingUser.setName(Objects.requireNonNullElse(userDto.getName(), existingUser.getName().toLowerCase()));
-        existingUser.setAddress(Objects.requireNonNullElse(userDto.getAddress(), existingUser.getAddress()));
-        existingUser.setEmail(Objects.requireNonNullElse(userDto.getEmail(), existingUser.getEmail()));
-        existingUser.setPhone(Objects.requireNonNullElse(userDto.getPhone(), existingUser.getPhone()));
-        existingUser.setDataRegister(Objects.requireNonNullElse(userDto.getDataRegister(), existingUser.getDataRegister()));
+    private static void setFields(UserRequestDto userRequestDto, User existingUser) {
+        existingUser.setCpf(Objects.requireNonNullElse(userRequestDto.getCpf(), existingUser.getCpf()));
+        existingUser.setName(Objects.requireNonNullElse(userRequestDto.getName(), existingUser.getName()).toLowerCase());
+        existingUser.setAddress(Objects.requireNonNullElse(userRequestDto.getAddress(), existingUser.getAddress()));
+        existingUser.setEmail(Objects.requireNonNullElse(userRequestDto.getEmail(), existingUser.getEmail()));
+        existingUser.setPhone(Objects.requireNonNullElse(userRequestDto.getPhone(), existingUser.getPhone()));
     }
 
     @Transactional
     public void delete(Long userId) throws UserNotFoundException {
-        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("id", userId));
         userRepository.delete(user);
     }
 }
