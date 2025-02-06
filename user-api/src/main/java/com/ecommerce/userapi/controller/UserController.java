@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,53 +21,52 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping
-    public List<UserDto> getUsers() {
-        return userService.getAll();
+    public ResponseEntity<List<UserDto>> findAll() {
+        return ResponseEntity.ok(userService.findAll());
     }
 
     @GetMapping("/pageable")
-    public Page<UserDto> getUsersPage(
+    public ResponseEntity<Page<UserDto>> findByPage(
             @RequestParam(value = "page", defaultValue = "0") Integer page,
             @RequestParam(value = "linesPerPage", defaultValue = "12") Integer linesPerPage,
             @RequestParam(value = "direction", defaultValue = "ASC") String direction,
             @RequestParam(value = "orderBy", defaultValue = "name") String orderBy
     ) {
         PageRequest pageRequest = PageRequest.of(page, linesPerPage, Sort.Direction.valueOf(direction), orderBy);
-
-        return userService.getAllPage(pageRequest);
+        return ResponseEntity.ok(userService.findByPage(pageRequest));
     }
 
     @GetMapping("/{id}")
-    public UserDto findById(@PathVariable("id") Long id) {
-        return userService.findById(id);
+    public ResponseEntity<UserDto> findById(@PathVariable("id") Long id) {
+        return ResponseEntity.ok(userService.findById(id));
     }
 
     @GetMapping("/cpf/{cpf}")
-    public UserDto findByCpf(@PathVariable("cpf") String cpf) {
-        return userService.findByCpf(cpf);
+    public ResponseEntity<UserDto> findByCpf(@PathVariable("cpf") String cpf) {
+        return ResponseEntity.ok(userService.findByCpf(cpf));
     }
 
     @GetMapping("/search")
-    public List<UserDto> queryByName(
+    public ResponseEntity<List<UserDto>> findByQueryName(
             @RequestParam(name = "name", required = true)
             String name) {
-        return userService.queryByName(name);
+        return ResponseEntity.ok(userService.findByQueryName(name));
     }
 
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public UserDto newUser(@Valid @RequestBody UserDto userDto) {
-        return userService.save(userDto);
+    public ResponseEntity<UserDto> createUser(@Valid @RequestBody UserDto userDto) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(userService.save(userDto));
     }
 
     @PutMapping("/{cpf}")
-    public UserDto updateUser(@RequestBody UserDto userDto, @PathVariable("cpf") String cpf) {
-        return userService.update(userDto, cpf);
+    public ResponseEntity<UserDto> updateUser(@RequestBody UserDto userDto, @PathVariable("cpf") String cpf) {
+        return ResponseEntity.ok(userService.update(userDto, cpf));
     }
 
     @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable("id") Long id) {
-         userService.delete(id);
+    public ResponseEntity<Void> deleteUser(@PathVariable("id") Long id) {
+        userService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 }
