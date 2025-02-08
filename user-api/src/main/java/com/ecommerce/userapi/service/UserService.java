@@ -34,24 +34,22 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public Page<UserResponseDto> findByPage(PageRequest page) {
-        Page<User> users = userRepository.findAll(page);
-        return users.map(mapper::mapTo);
+    public Page<UserResponseDto> findByPage(PageRequest pageRequest) {
+        return userRepository.findAll(pageRequest).map(mapper::mapTo);
     }
 
     @Transactional(readOnly = true)
     public UserResponseDto findById(Long userId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("id", userId));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("id", userId));
         return mapper.mapTo(user);
     }
 
     @Transactional(readOnly = true)
     public UserResponseDto findByCpf(String cpf) {
-        User user = userRepository.findByCpf(cpf);
-        if (user != null) {
-            return mapper.mapTo(user);
-        }
-        throw new UserNotFoundException("cpf", cpf);
+        User user = userRepository.findByCpf(cpf)
+                .orElseThrow(() -> new UserNotFoundException("cpf", cpf));
+        return mapper.mapTo(user);
     }
 
     @Transactional(readOnly = true)
@@ -64,9 +62,7 @@ public class UserService {
 
     @Transactional
     public UserResponseDto save(UserRequestDto userRequestDto) {
-        User ifExist = userRepository.findByCpf(userRequestDto.getCpf());
-
-        if (ifExist != null) {
+        if (userRepository.existsByCpf(userRequestDto.getCpf())) {
             throw new UserAlreadyExistsException("cpf", userRequestDto.getCpf());
         }
 
@@ -80,11 +76,8 @@ public class UserService {
 
     @Transactional
     public UserResponseDto update(UserRequestDto userRequestDto, String cpf) {
-        User existingUser = userRepository.findByCpf(cpf);
-
-        if (existingUser == null) {
-            throw new UserNotFoundException("cpf", cpf);
-        }
+        User existingUser = userRepository.findByCpf(cpf)
+                .orElseThrow(() -> new UserNotFoundException("cpf", cpf));
 
         setFields(userRequestDto, existingUser);
 
@@ -101,8 +94,9 @@ public class UserService {
     }
 
     @Transactional
-    public void delete(Long userId) throws UserNotFoundException {
-        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("id", userId));
+    public void delete(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("id", userId));
         userRepository.delete(user);
     }
 }
