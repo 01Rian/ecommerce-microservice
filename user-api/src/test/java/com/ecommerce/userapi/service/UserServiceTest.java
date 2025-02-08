@@ -217,7 +217,7 @@ class UserServiceTest {
     void findByCpf_ShouldReturnUserResponseDto_WhenUserExists() {
         // Arrange
         String cpf = "12345678901";
-        when(userRepository.findByCpf(cpf)).thenReturn(user);
+        when(userRepository.findByCpf(cpf)).thenReturn(Optional.of(user));
         when(mapper.mapTo(user)).thenReturn(userResponseDto);
 
         // Act
@@ -238,7 +238,7 @@ class UserServiceTest {
     void findByCpf_ShouldThrowUserNotFoundException_WhenUserDoesNotExist() {
         // Arrange
         String cpf = "99999999999";
-        when(userRepository.findByCpf(cpf)).thenReturn(null);
+        when(userRepository.findByCpf(cpf)).thenReturn(Optional.empty());
 
         // Act & Assert
         assertThatThrownBy(() -> userService.findByCpf(cpf))
@@ -341,7 +341,7 @@ class UserServiceTest {
     @DisplayName("save deve retornar UserResponseDto quando sucesso")
     void save_ShouldReturnUserResponseDto_WhenSuccessful() {
         // Arrange
-        when(userRepository.findByCpf(userRequestDto.getCpf())).thenReturn(null);
+        when(userRepository.existsByCpf(userRequestDto.getCpf())).thenReturn(false);
         when(mapper.mapFrom(userRequestDto)).thenReturn(user);
         when(userRepository.save(any(User.class))).thenReturn(user);
         when(mapper.mapTo(user)).thenReturn(userResponseDto);
@@ -361,7 +361,7 @@ class UserServiceTest {
         assertThat(savedUser.getName()).isEqualTo(userRequestDto.getName().toLowerCase());
         assertThat(savedUser.getDataRegister()).isNotNull();
 
-        verify(userRepository, times(1)).findByCpf(userRequestDto.getCpf());
+        verify(userRepository, times(1)).existsByCpf(userRequestDto.getCpf());
         verify(mapper, times(1)).mapFrom(userRequestDto);
         verify(userRepository, times(1)).save(any(User.class));
         verify(mapper, times(1)).mapTo(any(User.class));
@@ -371,7 +371,7 @@ class UserServiceTest {
     @DisplayName("save deve lançar UserAlreadyExistsException quando CPF já existe")
     void save_ShouldThrowUserAlreadyExistsException_WhenCpfAlreadyExists() {
         // Arrange
-        when(userRepository.findByCpf(userRequestDto.getCpf())).thenReturn(user);
+        when(userRepository.existsByCpf(userRequestDto.getCpf())).thenReturn(true);
 
         // Act & Assert
         assertThatThrownBy(() -> userService.save(userRequestDto))
@@ -379,7 +379,7 @@ class UserServiceTest {
                 .hasMessageContaining("cpf")
                 .hasMessageContaining(userRequestDto.getCpf());
 
-        verify(userRepository, times(1)).findByCpf(userRequestDto.getCpf());
+        verify(userRepository, times(1)).existsByCpf(userRequestDto.getCpf());
         verify(mapper, never()).mapFrom(any(UserRequestDto.class));
         verify(userRepository, never()).save(any(User.class));
     }
@@ -389,7 +389,7 @@ class UserServiceTest {
     void update_ShouldReturnUserResponseDto_WhenSuccessful() {
         // Arrange
         String cpf = "12345678901";
-        when(userRepository.findByCpf(cpf)).thenReturn(user);
+        when(userRepository.findByCpf(cpf)).thenReturn(Optional.of(user));
         when(userRepository.save(any(User.class))).thenReturn(user);
         when(mapper.mapTo(user)).thenReturn(userResponseDto);
 
@@ -420,7 +420,7 @@ class UserServiceTest {
     void update_ShouldThrowUserNotFoundException_WhenUserDoesNotExist() {
         // Arrange
         String cpf = "99999999999";
-        when(userRepository.findByCpf(cpf)).thenReturn(null);
+        when(userRepository.findByCpf(cpf)).thenReturn(Optional.empty());
 
         // Act & Assert
         assertThatThrownBy(() -> userService.update(userRequestDto, cpf))
