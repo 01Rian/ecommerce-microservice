@@ -21,7 +21,7 @@ public class CategoryService {
     private final CategoryMapper mapper;
 
     @Transactional(readOnly = true)
-    public List<CategoryResponse> getAllCategories() {
+    public List<CategoryResponse> findAllCategories() {
         List<Category> categories = categoryRepository.findAll();
         return categories.stream()
                 .map(mapper::toResponse)
@@ -29,7 +29,7 @@ public class CategoryService {
     }
 
     @Transactional(readOnly = true)
-    public CategoryResponse getCategoryById(Long id) {
+    public CategoryResponse findCategoryById(Long id) {
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> new CategoryNotFoundException(id));
         return mapper.toResponse(category);
