@@ -1,25 +1,26 @@
 package com.ecommerce.productapi.mappers.impl;
 
-import com.ecommerce.productapi.mappers.Mapper;
-import com.ecommerce.productapi.domain.dto.ProductDto;
+import com.ecommerce.productapi.domain.dto.request.ProductRequest;
+import com.ecommerce.productapi.domain.dto.response.ProductResponse;
 import com.ecommerce.productapi.domain.entities.Product;
+import com.ecommerce.productapi.mappers.Mapper;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 
 @RequiredArgsConstructor
 @Component
-public class ProductMapper implements Mapper<Product, ProductDto> {
+public class ProductMapper implements Mapper<Product, ProductRequest, ProductResponse> {
 
     private final ModelMapper modelMapper;
 
     @Override
-    public ProductDto mapTo(Product product) {
-        return modelMapper.map(product, ProductDto.class);
+    public ProductResponse toResponse(Product product) {
+        return modelMapper.map(product, ProductResponse.class);
     }
 
     @Override
-    public Product mapFrom(ProductDto productDto) {
-        return modelMapper.map(productDto, Product.class);
+    public Product toEntity(ProductRequest request) {
+        return modelMapper.map(request, Product.class);
     }
 }
