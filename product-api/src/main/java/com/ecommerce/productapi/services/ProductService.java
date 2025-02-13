@@ -1,6 +1,7 @@
 package com.ecommerce.productapi.services;
 
-import com.ecommerce.productapi.domain.dto.ProductDto;
+import com.ecommerce.productapi.domain.dto.request.ProductRequest;
+import com.ecommerce.productapi.domain.dto.response.ProductResponse;
 import com.ecommerce.productapi.domain.entities.*;
 import com.ecommerce.productapi.exception.*;
 import com.ecommerce.productapi.mappers.impl.*;
@@ -12,7 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -22,89 +22,81 @@ public class ProductService {
 
     private final ProductRepository productRepository;
     private final ProductMapper mapper;
-    private final CategoryMapper categoryMapper;
     private final CategoryRepository categoryRepository;
 
     @Transactional(readOnly = true)
-    public List<ProductDto> getAllProducts() {
+    public List<ProductResponse> getAllProducts() {
         List<Product> products = productRepository.findAll();
-        return products
-                .stream()
-                .map(mapper::mapTo)
+        return products.stream()
+                .map(mapper::toResponse)
                 .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
-    public Page<ProductDto> getAllPageProducts(PageRequest page) {
+    public Page<ProductResponse> getAllPageProducts(PageRequest page) {
         Page<Product> products = productRepository.findAll(page);
-        return products.map(mapper::mapTo);
+        return products.map(mapper::toResponse);
     }
 
     @Transactional(readOnly = true)
-    public List<ProductDto> getProductByCategoryId(Long categoryId) {
+    public List<ProductResponse> getProductByCategoryId(Long categoryId) {
         List<Product> products = productRepository.getProductByCategory(categoryId);
-        return products
-                .stream()
-                .map(mapper::mapTo)
+        return products.stream()
+                .map(mapper::toResponse)
                 .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
-    public ProductDto findByProductIdentifier(String identifier) {
+    public ProductResponse findByProductIdentifier(String identifier) {
         Product product = productRepository.findByProductIdentifier(identifier);
-
-        if (product != null) {
-            return mapper.mapTo(product);
+        if (product == null) {
+            throw new ProductNotFoundException(identifier);
         }
-        throw new ProductNotFoundException();
+        return mapper.toResponse(product);
     }
 
     @Transactional
-    public ProductDto save(ProductDto productDto) {
-        if (productDto.getProductIdentifier().isEmpty()) {
-            productDto.setProductIdentifier(UUID.randomUUID().toString());
-        } else {
-            productDto.setProductIdentifier(productDto.getProductIdentifier().toLowerCase());
+    public ProductResponse save(ProductRequest request) {
+        Category category = categoryRepository.findById(request.getCategoryId())
+                .orElseThrow(() -> new CategoryNotFoundException(request.getCategoryId()));
+
+        Product product = mapper.toEntity(request);
+        product.setCategory(category);
+        product.setProductIdentifier(UUID.randomUUID().toString());
+        
+        Product savedProduct = productRepository.save(product);
+        return mapper.toResponse(savedProduct);
+    }
+
+    @Transactional
+    public ProductResponse update(String identifier, ProductRequest request) {
+        Product existingProduct = productRepository.findByProductIdentifier(identifier);
+        if (existingProduct == null) {
+            throw new ProductNotFoundException(identifier);
         }
 
-        Product existingProduct = productRepository.findByProductIdentifier(productDto.getProductIdentifier());
-        if (existingProduct != null) throw new ProductAlreadyExistsException();
+        Category category = categoryRepository.findById(request.getCategoryId())
+                .orElseThrow(() -> new CategoryNotFoundException(request.getCategoryId()));
 
-        boolean existsCategory = categoryRepository.existsById(productDto.getCategory().getId());
-        if (!existsCategory) throw new CategoryNotFoundException();
+        updateProductFields(existingProduct, request, category);
+        
+        Product updatedProduct = productRepository.save(existingProduct);
+        return mapper.toResponse(updatedProduct);
+    }
 
-        productDto.setName(productDto.getName().toLowerCase());
-        Product product = productRepository.save(mapper.mapFrom(productDto));
-        return mapper.mapTo(product);
+    private void updateProductFields(Product product, ProductRequest request, Category category) {
+        product.setName(request.getName());
+        product.setDescription(request.getDescription());
+        product.setPrice(request.getPrice());
+        product.setQuantity(request.getQuantity());
+        product.setCategory(category);
     }
 
     @Transactional
-    public ProductDto updateProduct(ProductDto productDto, String identifier) {
-        Product existingProduct = productRepository.findByProductIdentifier(identifier.toLowerCase());
-        if (existingProduct == null) throw new ProductNotFoundException();
-
-        boolean existsCategory = categoryRepository.existsById(productDto.getCategory().getId());
-        if (!existsCategory) throw new CategoryNotFoundException();
-
-        Category category = categoryMapper.mapFrom(productDto.getCategory());
-
-        setFields(productDto, identifier, existingProduct, category);
-
-        Product updateProduct = productRepository.save(existingProduct);
-        return mapper.mapTo(updateProduct);
-    }
-
-    private static void setFields(ProductDto productDto, String identifier, Product existingProduct, Category category) {
-        existingProduct.setProductIdentifier(identifier.toLowerCase());
-        existingProduct.setName(Objects.requireNonNullElse(productDto.getName(), existingProduct.getName().toLowerCase()));
-        existingProduct.setDescription(Objects.requireNonNullElse(productDto.getDescription(), existingProduct.getDescription()));
-        existingProduct.setPrice(Objects.requireNonNullElse(productDto.getPrice(), existingProduct.getPrice()));
-        existingProduct.setCategory(category);
-    }
-
-    @Transactional
-    public void delete(Long productId) throws ProductNotFoundException {
-        Product product = productRepository.findById(productId).orElseThrow(ProductNotFoundException::new);
-        productRepository.delete(product);
+    public void delete(Long productId) {
+        if (!productRepository.existsById(productId)) {
+            throw new ProductNotFoundException(productId);
+        }
+        productRepository.deleteById(productId);
     }
 }
