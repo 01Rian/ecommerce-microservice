@@ -25,7 +25,7 @@ public class ProductService {
     private final CategoryRepository categoryRepository;
 
     @Transactional(readOnly = true)
-    public List<ProductResponse> getAllProducts() {
+    public List<ProductResponse> findAllProducts() {
         List<Product> products = productRepository.findAll();
         return products.stream()
                 .map(mapper::toResponse)
@@ -33,13 +33,13 @@ public class ProductService {
     }
 
     @Transactional(readOnly = true)
-    public Page<ProductResponse> getAllPageProducts(PageRequest page) {
+    public Page<ProductResponse> findAllPageProducts(PageRequest page) {
         Page<Product> products = productRepository.findAll(page);
         return products.map(mapper::toResponse);
     }
 
     @Transactional(readOnly = true)
-    public List<ProductResponse> getProductByCategoryId(Long categoryId) {
+    public List<ProductResponse> findProductByCategoryId(Long categoryId) {
         List<Product> products = productRepository.getProductByCategory(categoryId);
         return products.stream()
                 .map(mapper::toResponse)
