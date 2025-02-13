@@ -19,14 +19,14 @@ public class CategoryController {
     private final CategoryService categoryService;
 
     @GetMapping
-    public ResponseEntity<List<CategoryResponse>> getAllCategories() {
-        List<CategoryResponse> categories = categoryService.getAllCategories();
+    public ResponseEntity<List<CategoryResponse>> findAllCategories() {
+        List<CategoryResponse> categories = categoryService.findAllCategories();
         return ResponseEntity.ok(categories);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<CategoryResponse> getCategoryById(@PathVariable("id") Long id) {
-        CategoryResponse category = categoryService.getCategoryById(id);
+    public ResponseEntity<CategoryResponse> findCategoryById(@PathVariable("id") Long id) {
+        CategoryResponse category = categoryService.findCategoryById(id);
         return ResponseEntity.ok(category);
     }
 
