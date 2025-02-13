@@ -29,8 +29,8 @@ public class ProductController {
     private final PagedResourcesAssembler<ProductResponse> assembler;
 
     @GetMapping
-    public ResponseEntity<List<EntityModel<ProductResponse>>> getAllProducts() {
-        List<ProductResponse> products = productService.getAllProducts();
+    public ResponseEntity<List<EntityModel<ProductResponse>>> findAllProducts() {
+        List<ProductResponse> products = productService.findAllProducts();
         List<EntityModel<ProductResponse>> productModels = products.stream()
                 .map(this::createProductEntityModel)
                 .toList();
@@ -38,21 +38,21 @@ public class ProductController {
     }
 
     @GetMapping("/pageable")
-    public ResponseEntity<PagedModel<EntityModel<ProductResponse>>> getAllPageProducts(
+    public ResponseEntity<PagedModel<EntityModel<ProductResponse>>> findAllPageProducts(
             @RequestParam(value = "page", defaultValue = "0") Integer page,
             @RequestParam(value = "linesPerPage", defaultValue = "12") Integer linesPerPage,
             @RequestParam(value = "direction", defaultValue = "ASC") String direction,
             @RequestParam(value = "orderBy", defaultValue = "name") String orderBy
     ) {
         PageRequest pageRequest = PageRequest.of(page, linesPerPage, Sort.Direction.valueOf(direction), orderBy);
-        Page<ProductResponse> productPage = productService.getAllPageProducts(pageRequest);
+        Page<ProductResponse> productPage = productService.findAllPageProducts(pageRequest);
         PagedModel<EntityModel<ProductResponse>> pagedModel = assembler.toModel(productPage, this::createProductEntityModel);
         return ResponseEntity.ok(pagedModel);
     }
 
     @GetMapping("/category/{id}")
-    public ResponseEntity<List<EntityModel<ProductResponse>>> getProductByCategory(@PathVariable("id") Long categoryId) {
-        List<ProductResponse> products = productService.getProductByCategoryId(categoryId);
+    public ResponseEntity<List<EntityModel<ProductResponse>>> findProductByCategory(@PathVariable("id") Long categoryId) {
+        List<ProductResponse> products = productService.findProductByCategoryId(categoryId);
         List<EntityModel<ProductResponse>> productModels = products.stream()
                 .map(this::createProductEntityModel)
                 .toList();
@@ -60,7 +60,7 @@ public class ProductController {
     }
 
     @GetMapping("/{identifier}")
-    public ResponseEntity<EntityModel<ProductResponse>> getProductByIdentifier(@PathVariable("identifier") String identifier) {
+    public ResponseEntity<EntityModel<ProductResponse>> findProductByIdentifier(@PathVariable("identifier") String identifier) {
         ProductResponse product = productService.findByProductIdentifier(identifier);
         return ResponseEntity.ok(createProductEntityModel(product));
     }
@@ -89,10 +89,10 @@ public class ProductController {
     private EntityModel<ProductResponse> createProductEntityModel(ProductResponse product) {
         EntityModel<ProductResponse> entityModel = EntityModel.of(product);
 
-        WebMvcLinkBuilder linkToProducts = WebMvcLinkBuilder.linkTo(methodOn(this.getClass()).getAllProducts());
+        WebMvcLinkBuilder linkToProducts = WebMvcLinkBuilder.linkTo(methodOn(this.getClass()).findAllProducts());
         entityModel.add(linkToProducts.withRel("all-products"));
 
-        WebMvcLinkBuilder linkToSelf = WebMvcLinkBuilder.linkTo(methodOn(this.getClass()).getProductByIdentifier(product.getProductIdentifier()));
+        WebMvcLinkBuilder linkToSelf = WebMvcLinkBuilder.linkTo(methodOn(this.getClass()).findProductByIdentifier(product.getProductIdentifier()));
         entityModel.add(linkToSelf.withRel("self"));
 
         return entityModel;
