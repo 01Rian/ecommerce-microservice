@@ -1,6 +1,7 @@
 package com.ecommerce.productapi.controllers;
 
-import com.ecommerce.productapi.domain.dto.ProductDto;
+import com.ecommerce.productapi.domain.dto.request.ProductRequest;
+import com.ecommerce.productapi.domain.dto.response.ProductResponse;
 import com.ecommerce.productapi.services.ProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +13,7 @@ import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,69 +26,73 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 public class ProductController {
 
     private final ProductService productService;
-    private final PagedResourcesAssembler<ProductDto> assembler;
+    private final PagedResourcesAssembler<ProductResponse> assembler;
 
     @GetMapping
-    public List<EntityModel<ProductDto>> getAllProducts() {
-        List<ProductDto> productDtos = productService.getAllProducts();
-        return productDtos.stream()
+    public ResponseEntity<List<EntityModel<ProductResponse>>> getAllProducts() {
+        List<ProductResponse> products = productService.getAllProducts();
+        List<EntityModel<ProductResponse>> productModels = products.stream()
                 .map(this::createProductEntityModel)
                 .toList();
+        return ResponseEntity.ok(productModels);
     }
 
     @GetMapping("/pageable")
-    public PagedModel<EntityModel<ProductDto>> getAllPageProducts(
+    public ResponseEntity<PagedModel<EntityModel<ProductResponse>>> getAllPageProducts(
             @RequestParam(value = "page", defaultValue = "0") Integer page,
             @RequestParam(value = "linesPerPage", defaultValue = "12") Integer linesPerPage,
             @RequestParam(value = "direction", defaultValue = "ASC") String direction,
             @RequestParam(value = "orderBy", defaultValue = "name") String orderBy
     ) {
         PageRequest pageRequest = PageRequest.of(page, linesPerPage, Sort.Direction.valueOf(direction), orderBy);
-        Page<ProductDto> productPage = productService.getAllPageProducts(pageRequest);
-
-        return assembler.toModel(productPage, this::createProductEntityModel);
+        Page<ProductResponse> productPage = productService.getAllPageProducts(pageRequest);
+        PagedModel<EntityModel<ProductResponse>> pagedModel = assembler.toModel(productPage, this::createProductEntityModel);
+        return ResponseEntity.ok(pagedModel);
     }
 
     @GetMapping("/category/{id}")
-    public List<EntityModel<ProductDto>> getProductByCategory(@PathVariable("id") Long categoryId) {
-        List<ProductDto> productDtos = productService.getProductByCategoryId(categoryId);
-        return productDtos.stream()
+    public ResponseEntity<List<EntityModel<ProductResponse>>> getProductByCategory(@PathVariable("id") Long categoryId) {
+        List<ProductResponse> products = productService.getProductByCategoryId(categoryId);
+        List<EntityModel<ProductResponse>> productModels = products.stream()
                 .map(this::createProductEntityModel)
                 .toList();
+        return ResponseEntity.ok(productModels);
     }
 
     @GetMapping("/{identifier}")
-    public EntityModel<ProductDto> getProductByIdentifier(@PathVariable("identifier") String identifier) {
-        ProductDto productDto = productService.findByProductIdentifier(identifier);
-        return createProductEntityModel(productDto);
+    public ResponseEntity<EntityModel<ProductResponse>> getProductByIdentifier(@PathVariable("identifier") String identifier) {
+        ProductResponse product = productService.findByProductIdentifier(identifier);
+        return ResponseEntity.ok(createProductEntityModel(product));
     }
 
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public EntityModel<ProductDto> newProduct(@Valid @RequestBody ProductDto productDto) {
-        ProductDto newProduct = productService.save(productDto);
-        return createProductEntityModel(newProduct);
+    public ResponseEntity<EntityModel<ProductResponse>> newProduct(@Valid @RequestBody ProductRequest request) {
+        ProductResponse newProduct = productService.save(request);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(createProductEntityModel(newProduct));
     }
 
     @PutMapping("/{identifier}")
-    public EntityModel<ProductDto> updateProduct(@RequestBody ProductDto productDto, @PathVariable("identifier") String identifier) {
-        ProductDto productDtoUpdated = productService.updateProduct(productDto, identifier);
-        return createProductEntityModel(productDtoUpdated);
+    public ResponseEntity<EntityModel<ProductResponse>> updateProduct(
+            @Valid @RequestBody ProductRequest request,
+            @PathVariable("identifier") String identifier) {
+        ProductResponse updatedProduct = productService.update(identifier, request);
+        return ResponseEntity.ok(createProductEntityModel(updatedProduct));
     }
 
     @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable("id") Long id) {
+    public ResponseEntity<Void> delete(@PathVariable("id") Long id) {
         productService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 
-    private EntityModel<ProductDto> createProductEntityModel(ProductDto productDto) {
-        EntityModel<ProductDto> entityModel = EntityModel.of(productDto);
+    private EntityModel<ProductResponse> createProductEntityModel(ProductResponse product) {
+        EntityModel<ProductResponse> entityModel = EntityModel.of(product);
 
         WebMvcLinkBuilder linkToProducts = WebMvcLinkBuilder.linkTo(methodOn(this.getClass()).getAllProducts());
         entityModel.add(linkToProducts.withRel("all-products"));
 
-        WebMvcLinkBuilder linkToSelf = WebMvcLinkBuilder.linkTo(methodOn(this.getClass()).getProductByIdentifier(productDto.getProductIdentifier()));
+        WebMvcLinkBuilder linkToSelf = WebMvcLinkBuilder.linkTo(methodOn(this.getClass()).getProductByIdentifier(product.getProductIdentifier()));
         entityModel.add(linkToSelf.withRel("self"));
 
         return entityModel;
