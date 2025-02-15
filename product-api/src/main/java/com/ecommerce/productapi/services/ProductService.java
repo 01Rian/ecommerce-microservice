@@ -40,7 +40,11 @@ public class ProductService {
 
     @Transactional(readOnly = true)
     public List<ProductResponse> findProductByCategoryId(Long categoryId) {
+        categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new CategoryNotFoundException(categoryId));
+
         List<Product> products = productRepository.getProductByCategory(categoryId);
+        
         return products.stream()
                 .map(mapper::toResponse)
                 .collect(Collectors.toList());
