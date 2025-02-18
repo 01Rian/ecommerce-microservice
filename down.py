@@ -17,3 +17,7 @@ for base_dir in base_dirs:
         os.system(f"docker compose -f {compose_file} down")
     else:
         print(f"Docker-compose.yml File Not Found In {base_dir}")
+
+# Remove ecommerce network
+print("Removing ecommerce network")
+os.system("docker network rm ecommerce")

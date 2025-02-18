@@ -1,5 +1,8 @@
 import os
 
+# Create ecommerce network if it doesn't exist
+os.system("docker network create ecommerce 2>/dev/null || true")
+
 script_dir = os.path.dirname(__file__)
 
 base_dirs = [
