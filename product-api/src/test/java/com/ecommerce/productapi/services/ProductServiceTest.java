@@ -152,6 +152,7 @@ class ProductServiceTest {
         @DisplayName("Deve retornar produtos por categoria quando existirem")
         void shouldReturnProducts_WhenCategoryExists() {
             // Arrange
+            when(categoryRepository.findById(category.getId())).thenReturn(Optional.of(category));
             when(productRepository.getProductByCategory(category.getId())).thenReturn(List.of(product));
             when(mapper.toResponse(any(Product.class))).thenReturn(productResponse);
 
@@ -170,6 +171,37 @@ class ProductServiceTest {
 
             verify(productRepository).getProductByCategory(category.getId());
             verify(mapper).toResponse(any(Product.class));
+        }
+
+        @Test
+        @DisplayName("Deve retornar lista vazia quando não existirem produtos por categoria")
+        void shouldReturnEmptyList_WhenNoProductsByCategoryExist() {
+            // Arrange
+            when(categoryRepository.findById(category.getId())).thenReturn(Optional.of(category));
+            when(productRepository.getProductByCategory(category.getId())).thenReturn(Collections.emptyList());
+
+            // Act
+            List<ProductResponse> result = productService.findProductByCategoryId(category.getId());
+
+            // Assert
+            assertThat(result).isEmpty();
+            verify(productRepository).getProductByCategory(category.getId());
+            verify(mapper, never()).toResponse(any(Product.class));
+        }
+
+        @Test
+        @DisplayName("Deve lançar exceção ao buscar produtos por categoria inexistente")
+        void shouldThrowException_WhenCategoryDoesNotExist() {
+            // Arrange
+            when(categoryRepository.findById(INVALID_ID)).thenReturn(Optional.empty());
+
+            // Act & Assert
+            assertThatThrownBy(() -> productService.findProductByCategoryId(INVALID_ID))
+                    .isInstanceOf(CategoryNotFoundException.class)
+                    .hasMessageContaining(String.valueOf(INVALID_ID));
+
+            verify(categoryRepository).findById(INVALID_ID);
+            verify(productRepository, never()).getProductByCategory(any());
         }
 
         @Test
