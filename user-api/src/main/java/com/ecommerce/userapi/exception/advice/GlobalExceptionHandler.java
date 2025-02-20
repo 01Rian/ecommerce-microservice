@@ -1,6 +1,6 @@
 package com.ecommerce.userapi.exception.advice;
 
-import com.ecommerce.userapi.domain.dto.ErrorDto;
+import com.ecommerce.userapi.domain.dto.ErrorResponseDto;
 import com.ecommerce.userapi.exception.BaseException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,8 +18,8 @@ import java.util.Map;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(BaseException.class)
-    public ResponseEntity<ErrorDto> handleBaseException(BaseException ex) {
-        ErrorDto errorDto = new ErrorDto(
+    public ResponseEntity<ErrorResponseDto> handleBaseException(BaseException ex) {
+        ErrorResponseDto errorDto = new ErrorResponseDto(
                 ex.getStatus().value(),
                 ex.getMessage(),
                 ex.getErrorCode(),
@@ -29,7 +29,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorDto> handleValidationExceptions(MethodArgumentNotValidException ex) {
+    public ResponseEntity<ErrorResponseDto> handleValidationExceptions(MethodArgumentNotValidException ex) {
         Map<String, String> errors = new HashMap<>();
         ex.getBindingResult().getAllErrors().forEach((error) -> {
             String fieldName = ((FieldError) error).getField();
@@ -37,7 +37,7 @@ public class GlobalExceptionHandler {
             errors.put(fieldName, errorMessage);
         });
 
-        ErrorDto errorDto = new ErrorDto(
+        ErrorResponseDto errorDto = new ErrorResponseDto(
                 HttpStatus.BAD_REQUEST.value(),
                 "Erro de validação",
                 "VALIDATION_ERROR",
@@ -48,8 +48,8 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
-    public ResponseEntity<ErrorDto> handleUnsupportedMediaType(HttpMediaTypeNotSupportedException ex) {
-        ErrorDto errorDto = new ErrorDto(
+    public ResponseEntity<ErrorResponseDto> handleUnsupportedMediaType(HttpMediaTypeNotSupportedException ex) {
+        ErrorResponseDto errorDto = new ErrorResponseDto(
                 HttpStatus.UNSUPPORTED_MEDIA_TYPE.value(),
                 "Tipo de conteúdo não suportado. Use application/json",
                 "UNSUPPORTED_MEDIA_TYPE",
@@ -59,8 +59,8 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorDto> handleGenericException(Exception ex) {
-        ErrorDto errorDto = new ErrorDto(
+    public ResponseEntity<ErrorResponseDto> handleGenericException(Exception ex) {
+        ErrorResponseDto errorDto = new ErrorResponseDto(
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 "Erro interno do servidor",
                 "INTERNAL_SERVER_ERROR",

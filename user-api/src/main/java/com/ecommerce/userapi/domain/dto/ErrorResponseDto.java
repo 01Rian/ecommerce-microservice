@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 import java.util.Map;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public record ErrorDto(
+public record ErrorResponseDto(
         int status,
         String message,
         String errorCode,
@@ -15,7 +15,7 @@ public record ErrorDto(
         LocalDateTime timestamp,
         Map<String, String> errors
 ) {
-    public ErrorDto(int status, String message, String errorCode, LocalDateTime timestamp) {
+    public ErrorResponseDto(int status, String message, String errorCode, LocalDateTime timestamp) {
         this(status, message, errorCode, timestamp, null);
     }
 }
