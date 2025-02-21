@@ -31,7 +31,7 @@ public class CategoryService {
     @Transactional(readOnly = true)
     public CategoryResponse findCategoryById(Long id) {
         Category category = categoryRepository.findById(id)
-                .orElseThrow(() -> new CategoryNotFoundException(id));
+                .orElseThrow(() -> new CategoryNotFoundException("id", id));
         return mapper.toResponse(category);
     }
 
@@ -45,7 +45,7 @@ public class CategoryService {
     @Transactional
     public CategoryResponse update(Long id, CategoryRequest request) {
         Category existingCategory = categoryRepository.findById(id)
-                .orElseThrow(() -> new CategoryNotFoundException(id));
+                .orElseThrow(() -> new CategoryNotFoundException("id", id));
 
         updateCategoryFields(existingCategory, request);
         
@@ -61,7 +61,7 @@ public class CategoryService {
     @Transactional
     public void delete(Long id) {
         if (!categoryRepository.existsById(id)) {
-            throw new CategoryNotFoundException(id);
+            throw new CategoryNotFoundException("id", id);
         }
         categoryRepository.deleteById(id);
     }
