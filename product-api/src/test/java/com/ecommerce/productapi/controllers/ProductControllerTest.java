@@ -242,7 +242,7 @@ class ProductControllerTest {
                 @DisplayName("findProductByIdentifier - Deve retornar 404 quando produto não encontrado")
                 void whenFindProductByIdentifier_andProductNotFound_thenReturn404() throws Exception {
                         when(productService.findByProductIdentifier(PRODUCT_IDENTIFIER))
-                                        .thenThrow(new ProductNotFoundException("Produto não encontrado"));
+                                        .thenThrow(new ProductNotFoundException("idenfier", PRODUCT_IDENTIFIER));
 
                         mockMvc.perform(get("/products/" + PRODUCT_IDENTIFIER)
                                         .accept(MediaType.APPLICATION_JSON))
@@ -317,7 +317,7 @@ class ProductControllerTest {
                 void whenUpdateProduct_andProductNotFound_thenReturn404() throws Exception {
                         ProductRequest request = createValidProductRequest();
                         when(productService.update(eq(PRODUCT_IDENTIFIER), any(ProductRequest.class)))
-                                        .thenThrow(new ProductNotFoundException("Produto não encontrado"));
+                                        .thenThrow(new ProductNotFoundException("idenfier", PRODUCT_IDENTIFIER));
 
                         mockMvc.perform(put("/products/" + PRODUCT_IDENTIFIER)
                                         .contentType(MediaType.APPLICATION_JSON)
@@ -341,7 +341,7 @@ class ProductControllerTest {
                 @Test
                 @DisplayName("delete - Deve retornar 404 quando produto não encontrado")
                 void whenDeleteProduct_andProductNotFound_thenReturn404() throws Exception {
-                        doThrow(new ProductNotFoundException("Produto não encontrado"))
+                        doThrow(new ProductNotFoundException("idenfier", PRODUCT_IDENTIFIER))
                                         .when(productService).delete(PRODUCT_ID);
 
                         mockMvc.perform(delete("/products/" + PRODUCT_ID)
