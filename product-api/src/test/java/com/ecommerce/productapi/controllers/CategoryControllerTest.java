@@ -120,7 +120,7 @@ class CategoryControllerTest {
                 void whenFindCategoryById_andCategoryNotFound_thenReturn404() throws Exception {
                         // Arrange
                         when(categoryService.findCategoryById(CATEGORY_ID))
-                                        .thenThrow(new CategoryNotFoundException("Categoria não encontrada"));
+                                        .thenThrow(new CategoryNotFoundException("id", CATEGORY_ID));
 
                         // Act & Assert
                         mockMvc.perform(get("/categories/" + CATEGORY_ID))
@@ -189,7 +189,7 @@ class CategoryControllerTest {
                         // Arrange
                         CategoryRequest request = createValidCategoryRequest();
                         when(categoryService.update(eq(CATEGORY_ID), any(CategoryRequest.class)))
-                                        .thenThrow(new CategoryNotFoundException("Categoria não encontrada"));
+                                        .thenThrow(new CategoryNotFoundException("id", CATEGORY_ID));
 
                         // Act & Assert
                         mockMvc.perform(put("/categories/" + CATEGORY_ID)
@@ -228,7 +228,7 @@ class CategoryControllerTest {
                 @DisplayName("delete - Deve retornar 404 quando categoria não for encontrada")
                 void whenDeleteCategory_andCategoryNotFound_thenReturn404() throws Exception {
                         // Arrange
-                        doThrow(new CategoryNotFoundException("Categoria não encontrada"))
+                        doThrow(new CategoryNotFoundException("id", CATEGORY_ID))
                                         .when(categoryService).delete(CATEGORY_ID);
 
                         // Act & Assert
