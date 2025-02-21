@@ -41,7 +41,7 @@ public class ProductService {
     @Transactional(readOnly = true)
     public List<ProductResponse> findProductByCategoryId(Long categoryId) {
         categoryRepository.findById(categoryId)
-                .orElseThrow(() -> new CategoryNotFoundException(categoryId));
+                .orElseThrow(() -> new CategoryNotFoundException("id", categoryId));
 
         List<Product> products = productRepository.getProductByCategory(categoryId);
         
@@ -54,7 +54,7 @@ public class ProductService {
     public ProductResponse findByProductIdentifier(String identifier) {
         Product product = productRepository.findByProductIdentifier(identifier);
         if (product == null) {
-            throw new ProductNotFoundException(identifier);
+            throw new ProductNotFoundException("identifier", identifier);
         }
         return mapper.toResponse(product);
     }
@@ -62,7 +62,7 @@ public class ProductService {
     @Transactional
     public ProductResponse save(ProductRequest request) {
         Category category = categoryRepository.findById(request.getCategoryId())
-                .orElseThrow(() -> new CategoryNotFoundException(request.getCategoryId()));
+                .orElseThrow(() -> new CategoryNotFoundException("id", request.getCategoryId()));
 
         Product product = mapper.toEntity(request);
         product.setCategory(category);
@@ -76,11 +76,11 @@ public class ProductService {
     public ProductResponse update(String identifier, ProductRequest request) {
         Product existingProduct = productRepository.findByProductIdentifier(identifier);
         if (existingProduct == null) {
-            throw new ProductNotFoundException(identifier);
+            throw new ProductNotFoundException("identifier", identifier);
         }
 
         Category category = categoryRepository.findById(request.getCategoryId())
-                .orElseThrow(() -> new CategoryNotFoundException(request.getCategoryId()));
+                .orElseThrow(() -> new CategoryNotFoundException("id", request.getCategoryId()));
 
         updateProductFields(existingProduct, request, category);
         
@@ -99,7 +99,7 @@ public class ProductService {
     @Transactional
     public void delete(Long productId) {
         if (!productRepository.existsById(productId)) {
-            throw new ProductNotFoundException(productId);
+            throw new ProductNotFoundException("id", productId);
         }
         productRepository.deleteById(productId);
     }
