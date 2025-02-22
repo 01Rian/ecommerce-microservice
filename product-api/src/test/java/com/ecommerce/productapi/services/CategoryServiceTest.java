@@ -34,7 +34,7 @@ class CategoryServiceTest {
     private static final Long INVALID_ID = 999L;
     private static final String CATEGORY_NAME = "Eletrônicos";
     private static final String CATEGORY_DESCRIPTION = "Produtos eletrônicos em geral";
-    private static final String ERROR_MESSAGE_TEMPLATE = "Categoria não encontrada com ID: %d";
+    private static final String ERROR_MESSAGE_TEMPLATE = "Categoria não encontrado com id: '%d'";
 
     @Mock
     private CategoryRepository categoryRepository;
