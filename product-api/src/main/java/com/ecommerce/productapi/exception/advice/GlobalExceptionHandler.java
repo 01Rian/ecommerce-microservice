@@ -2,6 +2,8 @@ package com.ecommerce.productapi.exception.advice;
 
 import com.ecommerce.productapi.domain.dto.response.ErrorResponse;
 import com.ecommerce.productapi.exception.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -17,8 +19,11 @@ import java.util.List;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
     
+    private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+    
     @ExceptionHandler(BaseException.class)
     public ResponseEntity<ErrorResponse> handleBaseException(BaseException exception) {
+        logger.error("Base exception occurred:", exception);
         ErrorResponse errorResponse = ErrorResponse.builder()
                 .status(exception.getStatus().value())
                 .message(exception.getMessage())
@@ -30,6 +35,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleValidationException(MethodArgumentNotValidException exception) {
+        logger.error("Validation exception occurred:", exception);
         BindingResult result = exception.getBindingResult();
         List<FieldError> fieldErrors = result.getFieldErrors();
 
@@ -52,6 +58,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
     public ResponseEntity<ErrorResponse> handleHttpMediaTypeNotSupportedException(
             HttpMediaTypeNotSupportedException exception) {
+        logger.error("Media type not supported:", exception);
         ErrorResponse errorResponse = ErrorResponse.builder()
                 .status(HttpStatus.UNSUPPORTED_MEDIA_TYPE.value())
                 .message("Tipo de conteúdo não suportado. Use application/json")
@@ -63,9 +70,10 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGenericException(Exception exception) {
+        logger.error("Unexpected error occurred:", exception);
         ErrorResponse errorResponse = ErrorResponse.builder()
                 .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
-                .message("Erro interno do servidor")
+                .message("Erro interno do servidor: " + exception.getMessage())
                 .errorCode("INTERNAL_SERVER_ERROR")
                 .timestamp(LocalDateTime.now())
                 .build();
