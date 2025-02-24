@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -16,5 +18,5 @@ import lombok.NoArgsConstructor;
 public class Item {
 
     private String productIdentifier;
-    private Float price;
+    private BigDecimal price;
 }

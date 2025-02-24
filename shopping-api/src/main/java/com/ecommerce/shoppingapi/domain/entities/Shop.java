@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -22,7 +23,7 @@ public class Shop {
     private Long id;
 
     private String userIdentifier;
-    private Float total;
+    private BigDecimal total;
     private LocalDateTime date;
 
     @ElementCollection(fetch = FetchType.EAGER)
