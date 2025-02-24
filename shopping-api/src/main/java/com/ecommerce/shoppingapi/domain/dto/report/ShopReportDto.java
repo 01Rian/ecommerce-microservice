@@ -1,9 +1,11 @@
-package com.ecommerce.shoppingapi.domain.dto;
+package com.ecommerce.shoppingapi.domain.dto.report;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.math.BigDecimal;
 
 @Data
 @AllArgsConstructor
@@ -12,6 +14,6 @@ import lombok.NoArgsConstructor;
 public class ShopReportDto {
 
     private Integer count;
-    private Double total;
-    private Double mean;
+    private BigDecimal total;
+    private BigDecimal mean;
 }
