@@ -1,4 +1,6 @@
-package com.ecommerce.shoppingapi.domain.dto;
+package com.ecommerce.shoppingapi.domain.dto.shop;
+
+import java.math.BigDecimal;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -16,5 +18,5 @@ public class ItemDto {
     @NotBlank
     private String productIdentifier;
     @NotNull
-    private Float price;
+    private BigDecimal price;
 }
