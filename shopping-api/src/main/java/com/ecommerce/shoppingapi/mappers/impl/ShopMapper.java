@@ -1,6 +1,6 @@
 package com.ecommerce.shoppingapi.mappers.impl;
 
-import com.ecommerce.shoppingapi.domain.dto.ShopDto;
+import com.ecommerce.shoppingapi.domain.dto.shop.ShopDto;
 import com.ecommerce.shoppingapi.domain.entities.Shop;
 import com.ecommerce.shoppingapi.mappers.Mapper;
 import lombok.RequiredArgsConstructor;
