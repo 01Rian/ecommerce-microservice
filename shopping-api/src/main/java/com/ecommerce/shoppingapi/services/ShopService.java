@@ -1,7 +1,9 @@
 package com.ecommerce.shoppingapi.services;
 
-import com.ecommerce.shoppingapi.domain.dto.*;
-import com.ecommerce.shoppingapi.domain.dto.product.ProductDto;
+import com.ecommerce.shoppingapi.domain.dto.product.ProductResponseDto;
+import com.ecommerce.shoppingapi.domain.dto.report.ShopReportResponseDto;
+import com.ecommerce.shoppingapi.domain.dto.shop.ItemDto;
+import com.ecommerce.shoppingapi.domain.dto.shop.ShopDto;
 import com.ecommerce.shoppingapi.domain.entities.Shop;
 import com.ecommerce.shoppingapi.exception.ShoppingNotFoundException;
 import com.ecommerce.shoppingapi.mappers.impl.ShopMapper;
@@ -13,6 +15,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -54,12 +57,12 @@ public class ShopService {
 
     @Transactional(readOnly = true)
     public ShopDto findById(Long id) {
-        Shop shop = shopRepository.findById(id).orElseThrow(ShoppingNotFoundException::new);
+        Shop shop = shopRepository.findById(id).orElseThrow(() -> new ShoppingNotFoundException("id", id));
         return mapper.mapTo(shop);
     }
 
     @Transactional(readOnly = true)
-    public List<ShopDto> getShopsByFilter(LocalDate startDate, LocalDate endDate, Float maxValue) {
+    public List<ShopDto> getShopsByFilter(LocalDate startDate, LocalDate endDate, BigDecimal maxValue) {
         List<Shop> shops = reportRepository.getShopByFilters(startDate, endDate, maxValue);
         return shops
                 .stream()
@@ -68,7 +71,7 @@ public class ShopService {
     }
 
     @Transactional(readOnly = true)
-    public ShopReportDto getReportByDate(LocalDate startDate, LocalDate endDate) {
+    public ShopReportResponseDto getReportByDate(LocalDate startDate, LocalDate endDate) {
         return reportRepository.getReportByDate(startDate, endDate);
     }
 
@@ -86,7 +89,7 @@ public class ShopService {
                 shopDto.getItems()
                         .stream()
                         .map(ItemDto::getPrice)
-                        .reduce((float) 0, Float::sum)
+                        .reduce(BigDecimal.ZERO, BigDecimal::add)
         );
 
         Shop shop = mapper.mapFrom(shopDto);
@@ -98,7 +101,7 @@ public class ShopService {
 
     private boolean validateProducts(List<ItemDto> items) {
         for (ItemDto item : items) {
-            ProductDto productDto = productService.getProductByIdentifier(item.getProductIdentifier());
+            ProductResponseDto productDto = productService.getProductByIdentifier(item.getProductIdentifier());
 
             if (productDto == null) {
                 return false;
@@ -112,7 +115,7 @@ public class ShopService {
     public void delete(Long id) throws ShoppingNotFoundException {
         boolean exist = shopRepository.existsById(id);
         if (!exist) {
-            throw new ShoppingNotFoundException();
+            throw new ShoppingNotFoundException("id", id);	
         }
         shopRepository.deleteById(id);
     }
