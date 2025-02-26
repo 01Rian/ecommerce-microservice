@@ -1,8 +1,8 @@
 package com.ecommerce.shoppingapi.mappers;
 
-public interface Mapper<A, B> {
+public interface Mapper<E, Req, Res> {
 
-    B mapTo(A a);
+    Res toResponse(E entity);
 
-    A mapFrom(B b);
+    E fromRequest(Req request);
 }
