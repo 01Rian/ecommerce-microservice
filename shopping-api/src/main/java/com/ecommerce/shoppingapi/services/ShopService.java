@@ -3,7 +3,8 @@ package com.ecommerce.shoppingapi.services;
 import com.ecommerce.shoppingapi.domain.dto.product.ProductResponseDto;
 import com.ecommerce.shoppingapi.domain.dto.report.ShopReportResponseDto;
 import com.ecommerce.shoppingapi.domain.dto.shop.ItemDto;
-import com.ecommerce.shoppingapi.domain.dto.shop.ShopDto;
+import com.ecommerce.shoppingapi.domain.dto.shop.ShopRequestDto;
+import com.ecommerce.shoppingapi.domain.dto.shop.ShopResponseDto;
 import com.ecommerce.shoppingapi.domain.entities.Shop;
 import com.ecommerce.shoppingapi.exception.ShoppingNotFoundException;
 import com.ecommerce.shoppingapi.mappers.impl.ShopMapper;
@@ -32,41 +33,41 @@ public class ShopService {
     private final UserService userService;
 
     @Transactional(readOnly = true)
-    public List<ShopDto> getAll() {
+    public List<ShopResponseDto> getAll() {
         List<Shop> shops = shopRepository.findAll();
         return shops
                 .stream()
-                .map(mapper::mapTo)
+                .map(mapper::toResponse)
                 .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
-    public Page<ShopDto> getAllPage(PageRequest page) {
+    public Page<ShopResponseDto> getAllPage(PageRequest page) {
         Page<Shop> shops = shopRepository.findAll(page);
-        return shops.map(mapper::mapTo);
+        return shops.map(mapper::toResponse);
     }
 
     @Transactional(readOnly = true)
-    public List<ShopDto> getByUser(String userIdentifier) {
+    public List<ShopResponseDto> getByUser(String userIdentifier) {
         List<Shop> shops = shopRepository.findAllByUserIdentifier(userIdentifier);
         return shops
                 .stream()
-                .map(mapper::mapTo)
+                .map(mapper::toResponse)
                 .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
-    public ShopDto findById(Long id) {
+    public ShopResponseDto findById(Long id) {
         Shop shop = shopRepository.findById(id).orElseThrow(() -> new ShoppingNotFoundException("id", id));
-        return mapper.mapTo(shop);
+        return mapper.toResponse(shop);
     }
 
     @Transactional(readOnly = true)
-    public List<ShopDto> getShopsByFilter(LocalDate startDate, LocalDate endDate, BigDecimal maxValue) {
+    public List<ShopResponseDto> getShopsByFilter(LocalDate startDate, LocalDate endDate, BigDecimal maxValue) {
         List<Shop> shops = reportRepository.getShopByFilters(startDate, endDate, maxValue);
         return shops
                 .stream()
-                .map(mapper::mapTo)
+                .map(mapper::toResponse)
                 .collect(Collectors.toList());
     }
 
@@ -76,7 +77,7 @@ public class ShopService {
     }
 
     @Transactional
-    public ShopDto save(ShopDto shopDto) {
+    public ShopResponseDto save(ShopRequestDto shopDto) {
         if (userService.getUserByCfp(shopDto.getUserIdentifier()) == null) {
             return null;
         }
@@ -92,11 +93,11 @@ public class ShopService {
                         .reduce(BigDecimal.ZERO, BigDecimal::add)
         );
 
-        Shop shop = mapper.mapFrom(shopDto);
+        Shop shop = mapper.fromRequest(shopDto);
         shop.setDate(LocalDateTime.now());
         shopRepository.save(shop);
 
-        return mapper.mapTo(shop);
+        return mapper.toResponse(shop);
     }
 
     private boolean validateProducts(List<ItemDto> items) {
