@@ -21,6 +21,7 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long    id;
     private String  name;
+    @Column(columnDefinition = "float8")
     private BigDecimal price;
     private String  description;
     private Integer quantity;
