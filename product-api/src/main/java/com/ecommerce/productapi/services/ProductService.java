@@ -64,9 +64,14 @@ public class ProductService {
         Category category = categoryRepository.findById(request.getCategoryId())
                 .orElseThrow(() -> new CategoryNotFoundException("id", request.getCategoryId()));
 
-        Product product = mapper.toEntity(request);
-        product.setCategory(category);
-        product.setProductIdentifier(UUID.randomUUID().toString());
+        Product product = Product.builder()
+                .name(request.getName())
+                .description(request.getDescription())
+                .price(request.getPrice())
+                .quantity(request.getQuantity())
+                .category(category)
+                .productIdentifier(UUID.randomUUID().toString())
+                .build();
         
         Product savedProduct = productRepository.save(product);
         return mapper.toResponse(savedProduct);
