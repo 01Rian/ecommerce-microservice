@@ -1,14 +1,27 @@
 package com.ecommerce.shoppingapi.domain.dto.shop;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 @Data
+@Builder
 @NoArgsConstructor
-@SuperBuilder
-@EqualsAndHashCode(callSuper = true)
-public class ShopResponseDto extends ShopDto {
-    // Herda todos os campos do ShopDto
+@AllArgsConstructor
+public class ShopResponseDto {
+    private Long id;
+    private String userIdentifier;
+    private BigDecimal total;
+
+    @JsonFormat(pattern = "dd/MM/yyyy HH:mm:ss")
+    private LocalDateTime date;
+    
+    private List<ItemDto> items;
 }
