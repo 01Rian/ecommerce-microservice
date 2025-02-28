@@ -86,17 +86,14 @@ public class ShopService {
             return null;
         }
 
-        shopDto.setTotal(
-                shopDto.getItems()
-                        .stream()
-                        .map(ItemDto::getPrice)
-                        .reduce(BigDecimal.ZERO, BigDecimal::add)
-        );
-
         Shop shop = mapper.fromRequest(shopDto);
         shop.setDate(LocalDateTime.now());
-        shopRepository.save(shop);
+        shop.setTotal(shopDto.getItems()
+                        .stream()
+                        .map(ItemDto::getPrice)
+                        .reduce(BigDecimal.ZERO, BigDecimal::add));
 
+        shopRepository.save(shop);
         return mapper.toResponse(shop);
     }
 
