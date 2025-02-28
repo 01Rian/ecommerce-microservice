@@ -14,6 +14,7 @@ public class ProductService {
 
         try {
             String productApi = "http://product-api:8081/api/v1";
+            //String productApi = "http://localhost:8081/api/v1";
 
             WebClient webClient = WebClient.builder()
                     .baseUrl(productApi)
@@ -27,7 +28,7 @@ public class ProductService {
             return product.block();
         } catch (Exception e) {
             e.printStackTrace();
-            throw new ResourceNotFoundException();
+            throw new ResourceNotFoundException("Produto não encontrado");
         }
     }
 }
