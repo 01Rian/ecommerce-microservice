@@ -13,6 +13,7 @@ public class UserService {
 
         try {
             String productApi = "http://user-api:8080/api/v1/users";
+            //String productApi = "http://localhost:8080/api/v1/users";
 
             WebClient webClient = WebClient.builder()
                     .baseUrl(productApi)
@@ -26,7 +27,7 @@ public class UserService {
             return user.block();
         } catch (Exception e) {
             e.printStackTrace();
-            throw new ResourceNotFoundException();
+            throw new ResourceNotFoundException("Usuário não encontrado");
         }
     }
 }
