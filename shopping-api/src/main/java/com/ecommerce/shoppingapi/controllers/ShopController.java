@@ -1,7 +1,8 @@
 package com.ecommerce.shoppingapi.controllers;
 
-import com.ecommerce.shoppingapi.domain.dto.ShopDto;
-import com.ecommerce.shoppingapi.domain.dto.ShopReportDto;
+import com.ecommerce.shoppingapi.domain.dto.report.ShopReportResponseDto;
+import com.ecommerce.shoppingapi.domain.dto.shop.ShopRequestDto;
+import com.ecommerce.shoppingapi.domain.dto.shop.ShopResponseDto;
 import com.ecommerce.shoppingapi.services.ShopService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +13,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.util.List;
@@ -24,12 +26,12 @@ public class ShopController {
     private final ShopService shopService;
 
     @GetMapping
-    public List<ShopDto> getAllShops() {
+    public List<ShopResponseDto> getAllShops() {
         return shopService.getAll();
     }
 
     @GetMapping("/pageable")
-    public Page<ShopDto> getAllShopsPage(
+    public Page<ShopResponseDto> getAllShopsPage(
             @RequestParam(value = "page", defaultValue = "0") Integer page,
             @RequestParam(value = "linesPerPage", defaultValue = "12") Integer linesPerPage,
             @RequestParam(value = "direction", defaultValue = "ASC") String direction,
@@ -41,42 +43,42 @@ public class ShopController {
     }
 
     @GetMapping("/shopByUser/{userIdentifier}")
-    public List<ShopDto> getShopsByUserIdentifier(@PathVariable("userIdentifier") String userIdentifier) {
+    public List<ShopResponseDto> getShopsByUserIdentifier(@PathVariable("userIdentifier") String userIdentifier) {
         return shopService.getByUser(userIdentifier);
     }
 
     @GetMapping("/{id}")
-    public ShopDto findById(@PathVariable("id") Long id) {
+    public ShopResponseDto findById(@PathVariable("id") Long id) {
         return shopService.findById(id);
     }
 
     @GetMapping("/search")
-    public List<ShopDto> getShopsByFilter(
+    public List<ShopResponseDto> getShopsByFilter(
             @RequestParam(name = "startDate", required = true)
             @DateTimeFormat(pattern = "dd/MM/yyyy") LocalDate startDate,
             @RequestParam(name = "endDate", required = false)
             @DateTimeFormat(pattern = "dd/MM/yyyy") LocalDate endDate,
-            @RequestParam(name = "maxValue", required = false) Float maxValue
+            @RequestParam(name = "maxValue", required = false) BigDecimal maxValue
             ) {
         return shopService.getShopsByFilter(startDate, endDate, maxValue);
     }
 
     @GetMapping("/report")
-    public ShopReportDto getReportByDate(
+    public ShopReportResponseDto getReportByDate(
             @RequestParam(name = "startDate", required = true)
             @DateTimeFormat(pattern = "dd/MM/yyyy") LocalDate startDate,
             @RequestParam(name = "endDate", required = true)
             @DateTimeFormat(pattern = "dd/MM/yyyy") LocalDate endDate
             ) {
-        ShopReportDto report = shopService.getReportByDate(startDate, endDate);
+                ShopReportResponseDto report = shopService.getReportByDate(startDate, endDate);
 
         if (report.getCount() != 0) {
             DecimalFormat df = new DecimalFormat("#.##");
             String formattedMean = df.format(report.getMean()).replace(",", ".");
-            report.setMean(Double.valueOf(formattedMean));
+            report.setMean(new BigDecimal(formattedMean));
         } else {
-            report.setMean(0.0);
-            report.setTotal(0.0);
+            report.setMean(BigDecimal.ZERO);
+            report.setTotal(BigDecimal.ZERO);
         }
 
         return report;
@@ -84,7 +86,7 @@ public class ShopController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ShopDto newShop(@Valid @RequestBody ShopDto dto) {
+    public ShopResponseDto newShop(@Valid @RequestBody ShopRequestDto dto) {
         return shopService.save(dto);
     }
 
