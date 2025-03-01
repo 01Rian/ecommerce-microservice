@@ -9,23 +9,33 @@ import reactor.core.publisher.Mono;
 
 @Service
 public class ProductService {
+    
+    private WebClient.Builder webClientBuilder;
+    
+    public ProductService() {
+        this.webClientBuilder = WebClient.builder();
+    }
 
     public ProductResponseDto getProductByIdentifier(String productIdentifier) {
-
         try {
             String productApi = "http://product-api:8081/api/v1";
             //String productApi = "http://localhost:8081/api/v1";
 
-            WebClient webClient = WebClient.builder()
+            WebClient webClient = webClientBuilder
                     .baseUrl(productApi)
                     .build();
 
-            Mono<ProductResponseDto> product = webClient.get()
+            Mono<ProductResponseDto> productMono = webClient.get()
                     .uri("/products/" + productIdentifier)
                     .retrieve()
                     .bodyToMono(ProductResponseDto.class);
 
-            return product.block();
+            ProductResponseDto product = productMono.block();
+
+            if (product == null) {
+                throw new ResourceNotFoundException("Produto não encontrado");
+            }
+            return product;
         } catch (Exception e) {
             e.printStackTrace();
             throw new ResourceNotFoundException("Produto não encontrado");
