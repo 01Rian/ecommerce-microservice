@@ -6,6 +6,7 @@ import com.ecommerce.shoppingapi.domain.dto.shop.ItemDto;
 import com.ecommerce.shoppingapi.domain.dto.shop.ShopRequestDto;
 import com.ecommerce.shoppingapi.domain.dto.shop.ShopResponseDto;
 import com.ecommerce.shoppingapi.domain.entities.Shop;
+import com.ecommerce.shoppingapi.exception.ResourceNotFoundException;
 import com.ecommerce.shoppingapi.exception.ShoppingNotFoundException;
 import com.ecommerce.shoppingapi.mappers.impl.ShopMapper;
 import com.ecommerce.shoppingapi.repositories.ShopRepository;
@@ -48,7 +49,8 @@ public class ShopService {
     }
 
     @Transactional(readOnly = true)
-    public List<ShopResponseDto> getByUser(String userIdentifier) {
+    public List<ShopResponseDto> getByUser(String userIdentifier) throws ResourceNotFoundException {
+        userService.getUserByCfp(userIdentifier);
         List<Shop> shops = shopRepository.findAllByUserIdentifier(userIdentifier);
         return shops
                 .stream()
