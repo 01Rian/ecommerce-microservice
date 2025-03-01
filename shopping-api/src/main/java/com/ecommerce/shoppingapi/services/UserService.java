@@ -8,23 +8,34 @@ import reactor.core.publisher.Mono;
 
 @Service
 public class UserService {
+    
+    private WebClient.Builder webClientBuilder;
+    
+    public UserService() {
+        this.webClientBuilder = WebClient.builder();
+    }
 
     public UserResponseDto getUserByCfp(String cpf) {
-
         try {
-            String productApi = "http://user-api:8080/api/v1/users";
-            //String productApi = "http://localhost:8080/api/v1/users";
+            String userApi = "http://user-api:8080/api/v1/users";
+            //String userApi = "http://localhost:8080/api/v1/users";
 
-            WebClient webClient = WebClient.builder()
-                    .baseUrl(productApi)
+            WebClient webClient = webClientBuilder
+                    .baseUrl(userApi)
                     .build();
 
-            Mono<UserResponseDto> user = webClient.get()
+            Mono<UserResponseDto> userMono = webClient.get()
                     .uri("/cpf/" + cpf)
                     .retrieve()
                     .bodyToMono(UserResponseDto.class);
 
-            return user.block();
+            UserResponseDto user = userMono.block();
+            
+            if (user == null) {
+                throw new ResourceNotFoundException("Usuário não encontrado");
+            }
+            
+            return user;
         } catch (Exception e) {
             e.printStackTrace();
             throw new ResourceNotFoundException("Usuário não encontrado");
