@@ -15,7 +15,7 @@ public class UserService {
         this.webClientBuilder = WebClient.builder();
     }
 
-    public UserResponseDto getUserByCfp(String cpf) {
+    public UserResponseDto getUserByCpf(String cpf) {
         try {
             String userApi = "http://user-api:8080/api/v1/users";
             //String userApi = "http://localhost:8080/api/v1/users";

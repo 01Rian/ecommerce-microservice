@@ -50,7 +50,7 @@ public class ShopService {
 
     @Transactional(readOnly = true)
     public List<ShopResponseDto> getByUser(String userIdentifier) throws ResourceNotFoundException {
-        userService.getUserByCfp(userIdentifier);
+        userService.getUserByCpf(userIdentifier);
         List<Shop> shops = shopRepository.findAllByUserIdentifier(userIdentifier);
         return shops
                 .stream()
@@ -80,7 +80,7 @@ public class ShopService {
 
     @Transactional
     public ShopResponseDto save(ShopRequestDto shopDto) {
-        if (userService.getUserByCfp(shopDto.getUserIdentifier()) == null) {
+        if (userService.getUserByCpf(shopDto.getUserIdentifier()) == null) {
             return null;
         }
 
