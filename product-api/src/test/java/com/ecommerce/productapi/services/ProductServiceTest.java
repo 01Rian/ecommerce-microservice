@@ -251,7 +251,6 @@ class ProductServiceTest {
         void shouldSaveProduct_Successfully() {
             // Arrange
             when(categoryRepository.findById(category.getId())).thenReturn(Optional.of(category));
-            when(mapper.toEntity(productRequest)).thenReturn(product);
             when(productRepository.save(any(Product.class))).thenReturn(product);
             when(mapper.toResponse(product)).thenReturn(productResponse);
 
