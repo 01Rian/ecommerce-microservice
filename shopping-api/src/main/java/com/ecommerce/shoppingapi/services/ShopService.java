@@ -79,14 +79,12 @@ public class ShopService {
     }
 
     @Transactional
-    public ShopResponseDto save(ShopRequestDto shopDto) {
-        if (userService.getUserByCpf(shopDto.getUserIdentifier()) == null) {
-            return null;
-        }
+    public ShopResponseDto save(ShopRequestDto shopDto) throws ResourceNotFoundException {
+        // Valida se o usuário existe
+        userService.getUserByCpf(shopDto.getUserIdentifier());
 
-        if (!validateProducts(shopDto.getItems())) {
-            return null;
-        }
+        // Valida e atualiza os preços dos produtos
+        validateAndUpdateProducts(shopDto.getItems());
 
         Shop shop = mapper.fromRequest(shopDto);
         shop.setDate(LocalDateTime.now());
@@ -99,24 +97,20 @@ public class ShopService {
         return mapper.toResponse(shop);
     }
 
-    private boolean validateProducts(List<ItemDto> items) {
+    private void validateAndUpdateProducts(List<ItemDto> items) {
         for (ItemDto item : items) {
+            // Se o produto não for encontrado, o ProductService lança ResourceNotFoundException
             ProductResponseDto productDto = productService.getProductByIdentifier(item.getProductIdentifier());
-
-            if (productDto == null) {
-                return false;
-            }
             item.setPrice(productDto.getPrice());
         }
-        return true;
     }
 
     @Transactional
     public void delete(Long id) throws ShoppingNotFoundException {
         boolean exist = shopRepository.existsById(id);
         if (!exist) {
-            throw new ShoppingNotFoundException("id", id);	
+            throw new ShoppingNotFoundException("id", id);
         }
         shopRepository.deleteById(id);
     }
- }
+}
