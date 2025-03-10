@@ -2,6 +2,8 @@ package com.ecommerce.shoppingapi.services;
 
 import com.ecommerce.shoppingapi.domain.dto.user.UserResponseDto;
 import com.ecommerce.shoppingapi.exception.ResourceNotFoundException;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
@@ -9,21 +11,17 @@ import reactor.core.publisher.Mono;
 @Service
 public class UserService {
     
-    private WebClient.Builder webClientBuilder;
+    private final WebClient webClient;
     
-    public UserService() {
-        this.webClientBuilder = WebClient.builder();
+    public UserService(WebClient.Builder webClientBuilder,
+                      @Value("${user.api.url:http://user-api:8080/api/v1/users}") String userApiUrl) {
+        this.webClient = webClientBuilder
+            .baseUrl(userApiUrl)
+            .build();
     }
 
     public UserResponseDto getUserByCpf(String cpf) {
         try {
-            String userApi = "http://user-api:8080/api/v1/users";
-            //String userApi = "http://localhost:8080/api/v1/users";
-
-            WebClient webClient = webClientBuilder
-                    .baseUrl(userApi)
-                    .build();
-
             Mono<UserResponseDto> userMono = webClient.get()
                     .uri("/cpf/" + cpf)
                     .retrieve()
@@ -37,7 +35,6 @@ public class UserService {
             
             return user;
         } catch (Exception e) {
-            e.printStackTrace();
             throw new ResourceNotFoundException("Usuário não encontrado");
         }
     }
