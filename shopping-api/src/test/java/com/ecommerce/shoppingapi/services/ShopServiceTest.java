@@ -258,16 +258,30 @@ class ShopServiceTest {
         }
 
         @Test
-        @DisplayName("Deve retornar nulo quando usuário não for encontrado")
-        void save_ShouldReturnNull_WhenUserNotFound() {
+        @DisplayName("Deve lançar ResourceNotFoundException quando usuário não for encontrado")
+        void save_ShouldThrowResourceNotFoundException_WhenUserNotFound() {
             // Arrange
-            when(userService.getUserByCpf(anyString())).thenReturn(null);
+            when(userService.getUserByCpf(anyString()))
+                .thenThrow(new ResourceNotFoundException());
+    
+            // Act & Assert
+            assertThatThrownBy(() -> shopService.save(shopRequestDto))
+                .isInstanceOf(ResourceNotFoundException.class);
+                
+            verify(shopRepository, never()).save(any(Shop.class));
+        }
 
-            // Act
-            ShopResponseDto result = shopService.save(shopRequestDto);
-
-            // Assert
-            assertThat(result).isNull();
+        @Test
+        @DisplayName("Deve lançar ResourceNotFoundException quando produto não for encontrado")
+        void save_ShouldThrowResourceNotFoundException_WhenProductNotFound() {
+            // Arrange
+            when(productService.getProductByIdentifier(anyString()))
+                .thenThrow(new ResourceNotFoundException());
+    
+            // Act & Assert
+            assertThatThrownBy(() -> shopService.save(shopRequestDto))
+                .isInstanceOf(ResourceNotFoundException.class);
+                
             verify(shopRepository, never()).save(any(Shop.class));
         }
     }
