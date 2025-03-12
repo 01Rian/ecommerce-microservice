@@ -7,11 +7,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
@@ -35,8 +32,8 @@ class UserServiceTest {
     private static final String ERRO_USUARIO_NAO_ENCONTRADO = "Usuário não encontrado";
     private static final String API_ERROR_MESSAGE = "API Error";
     private static final String URI_PATH_CPF = "/cpf/";
+    private static final String USER_API_URL = "http://user-api:8080/api/v1/users";
 
-    @InjectMocks
     private UserService userService;
     
     @Mock
@@ -57,17 +54,17 @@ class UserServiceTest {
     @SuppressWarnings("unchecked")
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
-        
         // Configurar o mock do WebClient.Builder
         when(webClientBuilderMock.baseUrl(anyString())).thenReturn(webClientBuilderMock);
         when(webClientBuilderMock.build()).thenReturn(webClientMock);
+        
+        // Configurar o mock do WebClient
         when(webClientMock.get()).thenReturn(requestHeadersUriSpecMock);
         when(requestHeadersUriSpecMock.uri(anyString())).thenReturn(requestHeadersSpecMock);
         when(requestHeadersSpecMock.retrieve()).thenReturn(responseSpecMock);
         
-        // Injetar o WebClient.Builder mockado no serviço usando reflexão
-        ReflectionTestUtils.setField(userService, "webClientBuilder", webClientBuilderMock);
+        // Criar uma instância real do UserService com o WebClient.Builder mockado
+        userService = new UserService(webClientBuilderMock, USER_API_URL);
     }
 
     @Nested
